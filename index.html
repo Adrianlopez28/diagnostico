@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leer, inferir y argumentar: ruta gamificada para fortalecer la comprensión lectora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --theme-bg1: #14532d;
+      --theme-bg2: #166534;
+      --theme-dark: #052e16;
+      --theme-soft: #f0fdf4;
+
+      /* Colores por sección / nivel */
+      --c-intro: #6d28d9;
+      --c-diag: #334155;
+      --c-lit: #2563eb;
+      --c-inf: #0d9488;
+      --c-cri: #7c3aed;
+      --c-post: #d97706;
+
+      /* Colores por fase interna */
+      --f-concept: #475569;
+      --f-inicio: #0284c7;
+      --f-desarrollo: #ea580c;
+      --f-cierre: #16a34a;
+
+      --ok: #16a34a;
+      --ok-bg: #dcfce7;
+      --err: #dc2626;
+      --err-bg: #fee2e2;
+      --white: #ffffff;
+      --text: #1e293b;
+      --muted: #475569;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* LIENZO PRINCIPAL ESTILO GENIALLY */
+    .canvas {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      min-height: 580px;
+      background: #e5e7eb;
+      border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.85);
+    }
+
+    /* BARRA SUPERIOR PERSISTENTE (TÍTULO + CLASSROOM SIEMPRE VISIBLE) */
+    .hud-top {
+      background: linear-gradient(90deg, var(--theme-bg1), var(--theme-bg2));
+      color: #fff;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 10;
+      transition: background 0.35s ease;
+    }
+    .hud-brand {
+      display: flex;
+      flex-direction: column;
+    }
+    .hud-brand small {
+      font-size: 0.66rem;
+      color: #fde68a;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .hud-brand h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .hud-btn {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 6px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s;
+    }
+    .hud-btn:hover { background: rgba(255, 255, 255, 0.28); transform: translateY(-1px); }
+    .hud-btn.classroom {
+      background: #f59e0b;
+      border-color: #fbbf24;
+      color: #0f172a;
+      box-shadow: 0 3px 0 #b45309;
+    }
+    .hud-btn.classroom:hover { background: #fbbf24; }
+
+    /* BARRA DE RUTA (SE OCULTA EN PORTADA Y APARECE AL EMPEZAR) */
+    .route-bar {
+      display: none;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-bottom: 2px solid #cbd5e1;
+      z-index: 9;
+    }
+    .route-bar.visible { display: grid; }
+    @media (max-width: 760px) {
+      .route-bar { grid-template-columns: repeat(4, 1fr); }
+    }
+    .r-step {
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 5px 3px;
+      background: #fff;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.67rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-align: center;
+      transition: all 0.18s;
+    }
+    .r-step.locked { opacity: 0.42; cursor: not-allowed; filter: grayscale(0.6); }
+    .r-step.active { color: #fff; transform: translateY(-1px); }
+    .r-step.s-1.active { background: #6d28d9; border-color: #6d28d9; }
+    .r-step.s-2.active { background: #0369a1; border-color: #0369a1; }
+    .r-step.s-3.active { background: #15803d; border-color: #15803d; }
+    .r-step.s-4.active { background: var(--c-diag); border-color: var(--c-diag); }
+    .r-step.s-5.active { background: var(--c-lit); border-color: var(--c-lit); }
+    .r-step.s-6.active { background: var(--c-inf); border-color: var(--c-inf); }
+    .r-step.s-7.active { background: var(--c-cri); border-color: var(--c-cri); }
+    .r-step.s-8.active { background: var(--c-post); border-color: var(--c-post); }
+
+    /* ================= PANTALLA 0: PORTADA EXACTA A LA IMAGEN ================= */
+    .cover-wrap {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 18px 34px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    /* Franja superior estilo código Matrix verde */
+    .matrix-banner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 36%;
+      background: #020804;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .matrix-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      opacity: 0.9;
+    }
+    /* Figuras geométricas decorativas de la imagen */
+    .geo-dotted-circle {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px dotted #14532d;
+      left: 28px;
+      top: 38%;
+      z-index: 1;
+      opacity: 0.85;
+    }
+    .geo-dark-diamond {
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      background: #144519;
+      border-radius: 16px;
+      transform: rotate(35deg);
+      right: -75px;
+      top: 22%;
+      z-index: 2;
+    }
+    .geo-dotted-square {
+      position: absolute;
+      width: 115px;
+      height: 115px;
+      border: 3px dotted #14532d;
+      transform: rotate(18deg);
+      right: 65px;
+      bottom: 24px;
+      z-index: 1;
+    }
+    .geo-green-circle {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #144519;
+      left: -24px;
+      bottom: -20px;
+      z-index: 5;
+    }
+
+    /* Tarjeta blanca con borde morado punteado */
+    .cover-frame {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 720px;
+      border: 3px dashed #7c3aed;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .cover-card {
+      position: relative;
+      background: #ffffff;
+      border-radius: 36px;
+      padding: 28px 28px 46px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+    }
+    .cover-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      font-weight: 900;
+      color: #000000;
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+    .cover-dice {
+      width: 64px;
+      height: 64px;
+      margin: 4px auto 12px;
+      display: block;
+      animation: floatDice 2.8s ease-in-out infinite;
+    }
+    @keyframes floatDice {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(4deg); }
+    }
+    .cover-subtitle {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: #14532d;
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .cover-tagline {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #6d28d9;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      max-width: 520px;
+      margin: 0 auto 12px;
+      line-height: 1.45;
+    }
+    .btn-empezar {
+      position: absolute;
+      left: 50%;
+      bottom: -24px;
+      transform: translateX(-50%);
+      background: #f5b027;
+      color: #ffffff;
+      border: none;
+      padding: 13px 54px;
+      border-radius: 999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #c2820a, 0 12px 24px rgba(245, 176, 39, 0.4);
+      transition: all 0.18s;
+      z-index: 6;
+    }
+    .btn-empezar:hover {
+      background: #f59e0b;
+      transform: translateX(-50%) translateY(-2px);
+    }
+    .btn-empezar:active {
+      transform: translateX(-50%) translateY(2px);
+      box-shadow: 0 2px 0 #c2820a;
+    }
+
+    /* ================= ESCENARIO INTERACTIVO (DIAPOSITIVAS INTERNAS) ================= */
+    .stage {
+      flex: 1;
+      padding: 16px 20px;
+      background: radial-gradient(circle at top right, var(--theme-soft) 0%, #ffffff 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .slide-anim {
+      animation: slideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .sec-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .sec-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .sec-desc {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* TARJETAS INTERACTIVAS (OBJETIVOS, CRITERIOS, ADDIE) */
+    .interactive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .flip-card {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-top: 5px solid #6d28d9;
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 0 #e2e8f0;
+      text-align: left;
+    }
+    .flip-card:hover { transform: translateY(-2px); border-color: #7c3aed; }
+    .flip-card.opened { background: #f5f3ff; border-color: #7c3aed; }
+    .flip-card .fc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 0.84rem;
+      color: #0f172a;
+      margin-bottom: 5px;
+    }
+    .flip-card .fc-body {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .flip-card .fc-detail {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #c4b5fd;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #5b21b6;
+      display: none;
+    }
+    .flip-card.opened .fc-detail { display: block; }
+
+    /* SELECTOR INTERACTIVO SIEE Y ADDIE */
+    .tab-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .tab-pill {
+      border: 2px solid #cbd5e1;
+      background: #fff;
+      color: var(--text);
+      padding: 7px 13px;
+      border-radius: 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #cbd5e1;
+      transition: all 0.16s;
+    }
+    .tab-pill:hover { transform: translateY(-1px); }
+    .tab-pill.active {
+      background: var(--theme-bg2);
+      border-color: var(--theme-bg2);
+      color: #fff;
+      box-shadow: 0 3px 0 var(--theme-dark);
+    }
+    .info-panel {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-left: 6px solid var(--theme-bg2);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+    .info-panel h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.96rem;
+      color: #0f172a;
+      margin-bottom: 5px;
+    }
+    .info-panel p { font-size: 0.85rem; color: var(--muted); line-height: 1.48; }
+
+    /* SUB-FASES DENTRO DE CADA MÓDULO */
+    .phase-dots {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .p-chip {
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 5px 6px;
+      font-size: 0.69rem;
+      font-weight: 800;
+      background: #fff;
+      cursor: pointer;
+      text-align: center;
+    }
+    .p-chip.locked { opacity: 0.4; cursor: not-allowed; }
+    .p-chip.ph-0 { color: var(--f-concept); border-color: #cbd5e1; }
+    .p-chip.ph-0.active { background: var(--f-concept); color: #fff; }
+    .p-chip.ph-1 { color: var(--f-inicio); border-color: #bae6fd; }
+    .p-chip.ph-1.active { background: var(--f-inicio); color: #fff; }
+    .p-chip.ph-2 { color: var(--f-desarrollo); border-color: #fed7aa; }
+    .p-chip.ph-2.active { background: var(--f-desarrollo); color: #fff; }
+    .p-chip.ph-3 { color: var(--f-cierre); border-color: #bbf7d0; }
+    .p-chip.ph-3.active { background: var(--f-cierre); color: #fff; }
+
+    /* LECTURA Y PREGUNTAS (1 POR PANTALLA) */
+    .story-box {
+      background: #fffbeb;
+      border: 2px solid #fde68a;
+      border-left: 6px solid #f59e0b;
+      border-radius: 13px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+    .story-box .s-title {
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #b45309;
+      margin-bottom: 2px;
+    }
+    .story-box p { font-size: 0.86rem; color: #1e293b; line-height: 1.45; }
+
+    .q-heading {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+    }
+    @media (max-width: 640px) {
+      .options-grid { grid-template-columns: 1fr; }
+    }
+    .opt-card {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-radius: 13px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      box-shadow: 0 4px 0 #cbd5e1;
+      transition: all 0.14s;
+    }
+    .opt-card:hover:not(:disabled) {
+      border-color: var(--theme-bg2);
+      background: var(--theme-soft);
+      transform: translateY(-2px);
+    }
+    .opt-letter {
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      background: var(--theme-bg2);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .opt-card.correct { border-color: var(--ok); background: var(--ok-bg); color: #14532d; box-shadow: 0 4px 0 #15803d; }
+    .opt-card.correct .opt-letter { background: var(--ok); }
+    .opt-card.wrong { border-color: var(--err); background: var(--err-bg); color: #7f1d1d; box-shadow: 0 4px 0 #b91c1c; }
+    .opt-card.wrong .opt-letter { background: var(--err); }
+
+    .feedback-bar {
+      margin-top: 10px;
+      padding: 9px 13px;
+      border-radius: 11px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .feedback-bar.show { display: flex; }
+    .feedback-bar.ok { background: var(--ok-bg); color: #14532d; border: 2px solid #86efac; }
+    .feedback-bar.err { background: var(--err-bg); color: #7f1d1d; border: 2px solid #fca5a5; }
+
+    /* PROGRESO Y GAMIFICACIÓN */
+    .prog-wrap { display: flex; align-items: center; gap: 7px; }
+    .prog-track { width: 120px; height: 9px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+    .prog-lbl { font-size: 0.74rem; font-weight: 800; color: var(--muted); }
+
+    .gamif-banner {
+      background: #f0fdfa;
+      border: 2px solid #99f6e4;
+      border-radius: 11px;
+      padding: 7px 12px;
+      margin-bottom: 9px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #0f766e;
+    }
+    .ladder-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    .ladder-cell {
+      background: #fef3c7;
+      border: 2px solid #fcd34d;
+      border-radius: 9px;
+      padding: 5px 3px;
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #92400e;
+    }
+    .ladder-cell.current { background: #fde68a; border-color: #d97706; }
+    .ladder-cell.done { background: #16a34a; border-color: #15803d; color: #fff; }
+
+    /* BOTONES 3D Y ACCIONES DE PIE */
+    .nav-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-3d {
+      background: var(--theme-bg2);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--theme-dark);
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .btn-3d:hover { transform: translateY(-2px); filter: brightness(1.07); }
+    .btn-3d.sec { background: #64748b; box-shadow: 0 4px 0 #334155; }
+    .btn-3d.gold { background: #f59e0b; color: #0f172a; box-shadow: 0 4px 0 #b45309; }
+    .btn-3d.green { background: #16a34a; box-shadow: 0 4px 0 #14532d; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 9px;
+      margin: 12px 0 16px;
+    }
+    .stat-tile {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 13px;
+      padding: 11px 8px;
+      text-align: center;
+      box-shadow: 0 4px 0 #e2e8f0;
+    }
+    .stat-tile .num { font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 800; }
+    .stat-tile .lbl { font-size: 0.72rem; font-weight: 800; color: var(--muted); }
+
+    .hud-foot {
+      background: #f8fafc;
+      border-top: 2px solid #cbd5e1;
+      padding: 7px 16px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <!-- BARRA SUPERIOR PERSISTENTE -->
+    <header class="hud-top">
+      <div class="hud-brand">
+        <small>Recurso Educativo Digital • Modelo ADDIE • Grado 601</small>
+        <h1>🧭 Leer, inferir y argumentar: ruta gamificada para fortalecer la comprensión lectora</h1>
+      </div>
+      <div class="hud-actions">
+        <button class="hud-btn" id="modeBtn" onclick="toggleFreeMode()">🔓 Modo Libre</button>
+        <a class="hud-btn classroom" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
+          🎓 Ir a Google Classroom
+        </a>
+      </div>
+    </header>
+
+    <!-- BARRA DE NAVEGACIÓN DE LA RUTA COMPLETA -->
+    <nav class="route-bar" id="routeBar">
+      <button class="r-step s-1" id="st-1" onclick="goScreen(1)">🎯 1. Objetivos</button>
+      <button class="r-step s-2" id="st-2" onclick="goScreen(2)">📏 2. Criterios</button>
+      <button class="r-step s-3" id="st-3" onclick="goScreen(3)">🧩 3. Fases ADDIE</button>
+      <button class="r-step s-4" id="st-4" onclick="goScreen(4)">📋 4. Diagnóstico</button>
+      <button class="r-step s-5" id="st-5" onclick="goScreen(5)">📘 5. Literal</button>
+      <button class="r-step s-6" id="st-6" onclick="goScreen(6)">🔍 6. Inferencial</button>
+      <button class="r-step s-7" id="st-7" onclick="goScreen(7)">⚖️ 7. Crítico</button>
+      <button class="r-step s-8" id="st-8" onclick="goScreen(8)">🏆 8. Post-test</button>
+    </nav>
+
+    <!-- CONTENEDOR DINÁMICO DE PANTALLAS -->
+    <div id="mainMount" style="flex:1; display:flex; flex-direction:column;"></div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="hud-foot">
+      <span>Estrategia Gamificada • I.E.T. Remedios Solano (Barrancas, La Guajira)</span>
+      <span>Código Google Classroom: <strong>umxduefs</strong></span>
+    </footer>
+  </div>
+
+  <script>
+    /* ================= TEMAS POR PANTALLA ================= */
+    const themes = {
+      0: { bg1: '#14532d', bg2: '#166534', dark: '#052e16', soft: '#f0fdf4' },
+      1: { bg1: '#4c1d95', bg2: '#6d28d9', dark: '#3b0764', soft: '#f5f3ff' },
+      2: { bg1: '#0c4a6e', bg2: '#0369a1', dark: '#082f49', soft: '#f0f9ff' },
+      3: { bg1: '#14532d', bg2: '#15803d', dark: '#052e16', soft: '#f0fdf4' },
+      4: { bg1: '#1e293b', bg2: '#334155', dark: '#0f172a', soft: '#f1f5f9' },
+      5: { bg1: '#1e3a8a', bg2: '#2563eb', dark: '#1e3a8a', soft: '#eff6ff' },
+      6: { bg1: '#115e59', bg2: '#0d9488', dark: '#134e4a', soft: '#f0fdfa' },
+      7: { bg1: '#5b21b6', bg2: '#7c3aed', dark: '#4c1d95', soft: '#f5f3ff' },
+      8: { bg1: '#92400e', bg2: '#d97706', dark: '#78350f', soft: '#fffbeb' }
+    };
+
+    function applyTheme(scr) {
+      const t = themes[scr] || themes[0];
+      const s = document.documentElement.style;
+      s.setProperty('--theme-bg1', t.bg1);
+      s.setProperty('--theme-bg2', t.bg2);
+      s.setProperty('--theme-dark', t.dark);
+      s.setProperty('--theme-soft', t.soft);
+    }
+
+    /* ================= ESTADO GLOBAL ================= */
+    let currentScreen = 0;
+    let maxUnlocked = 1; // 0=Portada, 1=Objetivos, 2=Criterios, 3=ADDIE, 4=Diag, 5=Lit, 6=Inf, 7=Cri, 8=Post
+    let freeMode = false;
+    let autoTimer = null;
+    let matrixAnim = null;
+
+    function stopTimers() {
+      if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+      if (matrixAnim) { cancelAnimationFrame(matrixAnim); matrixAnim = null; }
+    }
+
+    function updateRouteBar() {
+      const bar = document.getElementById('routeBar');
+      bar.classList.toggle('visible', currentScreen > 0);
+      for (let i = 1; i <= 8; i++) {
+        const el = document.getElementById('st-' + i);
+        const open = freeMode || i <= maxUnlocked;
+        el.classList.toggle('locked', !open);
+        el.classList.toggle('active', i === currentScreen);
+      }
+    }
+
+    function toggleFreeMode() {
+      freeMode = !freeMode;
+      document.getElementById('modeBtn').textContent = freeMode ? '🔒 Modo Progresivo' : '🔓 Modo Libre';
+      updateRouteBar();
+      if (currentScreen >= 5 && currentScreen <= 7) renderModule(currentScreen - 4);
+    }
+
+    function goScreen(scr) {
+      if (scr > 0 && !freeMode && scr > maxUnlocked) return;
+      stopTimers();
+      currentScreen = scr;
+      applyTheme(scr);
+      updateRouteBar();
+      if (scr === 0) renderCover();
+      else if (scr === 1) renderObjectives();
+      else if (scr === 2) renderCriteria();
+      else if (scr === 3) renderAddieIntro();
+      else if (scr === 4) renderDiag();
+      else if (scr >= 5 && scr <= 7) renderModule(scr - 4);
+      else if (scr === 8) renderPost();
+    }
+
+    /* ================= 0. PORTADA (ESTILO IMAGEN SUBIDA) ================= */
+    function renderCover() {
+      const mount = document.getElementById('mainMount');
+      mount.innerHTML = `
+        <div class="cover-wrap">
+          <div class="matrix-banner"><canvas class="matrix-canvas" id="matrixCanvas"></canvas></div>
+          <div class="geo-dotted-circle"></div>
+          <div class="geo-dark-diamond"></div>
+          <div class="geo-dotted-square"></div>
+
+          <div class="cover-frame">
+            <div class="geo-green-circle"></div>
+            <div class="cover-card">
+              <div class="cover-title">Producto Final</div>
+              <svg class="cover-dice" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M32 6L54 18.5V45.5L32 58L10 45.5V18.5L32 6Z" stroke="#7c3aed" stroke-width="3.5" stroke-linejoin="round"/>
+                <path d="M10 18.5L32 31L54 18.5" stroke="#7c3aed" stroke-width="3.5" stroke-linejoin="round"/>
+                <path d="M32 31V58" stroke="#7c3aed" stroke-width="3.5" stroke-linejoin="round"/>
+                <circle cx="32" cy="18.5" r="2.8" fill="#7c3aed"/>
+                <circle cx="21" cy="36" r="2.8" fill="#7c3aed"/>
+                <circle cx="21" cy="46" r="2.8" fill="#7c3aed"/>
+                <circle cx="43" cy="34" r="2.8" fill="#7c3aed"/>
+                <circle cx="48" cy="40" r="2.8" fill="#7c3aed"/>
+                <circle cx="38" cy="45" r="2.8" fill="#7c3aed"/>
+              </svg>
+              <div class="cover-subtitle">“Leer, inferir y argumentar: ruta gamificada para fortalecer la comprensión lectora”</div>
+              <p class="cover-tagline">
+                COMBINA PISTAS, RESUELVE RETOS CON INGENIO...<br/>
+                Y DEMUESTRA QUE ERES UN AGENTE DE LETRAS ESTRATEGA
+              </p>
+              <button class="btn-empezar" onclick="startExperience()">EMPEZAR</button>
+            </div>
+          </div>
+        </div>
+      `;
+      startMatrixRain();
+    }
+
+    function startExperience() {
+      maxUnlocked = Math.max(maxUnlocked, 1);
+      goScreen(1);
+    }
+
+    function startMatrixRain() {
+      const canvas = document.getElementById('matrixCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth || 960;
+      canvas.height = canvas.offsetHeight || 220;
+      const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアウエオカキクケコ";
+      const fontSize = 14;
+      const cols = Math.floor(canvas.width / fontSize);
+      const drops = Array(cols).fill(1).map(() => Math.random() * 15);
+
+      function draw() {
+        ctx.fillStyle = "rgba(2, 8, 4, 0.14)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#22c55e";
+        ctx.font = fontSize + "px monospace";
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.96) drops[i] = 0;
+          drops[i] += 0.45;
+        }
+        matrixAnim = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    /* ================= 1. OBJETIVOS DE APRENDIZAJE (INTERACTIVO) ================= */
+    const objectivesList = [
+      {
+        icon: "🎯", title: "Propósito General", color: "#6d28d9",
+        short: "Fortalecer la comprensión lectora en grado sexto mediante secuencias didácticas gamificadas.",
+        detail: "Integra textos continuos y discontinuos de la tradición oral y cultura Wayuu en una ruta progresiva mediada por TIC."
+      },
+      {
+        icon: "📘", title: "Objetivo Literal", color: "#2563eb",
+        short: "Localizar información explícita, personajes, lugares y secuencias de hechos en textos narrativos.",
+        detail: "Evidencia: Precisión en la identificación de detalles puntuales sin confundir el concepto de lectura literal."
+      },
+      {
+        icon: "🔍", title: "Objetivo Inferencial", color: "#0d9488",
+        short: "Deducir causas, consecuencias, intenciones y significados ocultos relacionando pistas con saberes previos.",
+        detail: "Evidencia: Resolución de pistas implícitas en retos interactivos y recorridos contextualizados en La Guajira."
+      },
+      {
+        icon: "⚖️", title: "Objetivo Crítico", color: "#7c3aed",
+        short: "Evaluar la intención comunicativa de textos y anuncios, diferenciando hechos de opiniones con argumentos.",
+        detail: "Evidencia: Postura fundamentada frente a publicidad engañosa y textos culturales."
+      }
+    ];
+
+    function renderObjectives() {
+      const mount = document.getElementById('mainMount');
+      let cardsHtml = '';
+      objectivesList.forEach((o, i) => {
+        cardsHtml += `
+          <div class="flip-card" style="border-top-color:${o.color};" onclick="this.classList.toggle('opened')">
+            <div class="fc-head"><span>${o.icon} ${o.title}</span><span style="font-size:0.72rem; color:${o.color};">+ Ver meta</span></div>
+            <div class="fc-body">${o.short}</div>
+            <div class="fc-detail">✨ ${o.detail}</div>
+          </div>
+        `;
+      });
+
+      mount.innerHTML = `
+        <div class="stage slide-anim">
+          <div class="section-header">
+            <span class="sec-pill" style="background:#6d28d9;">Paso 1 • Intencionalidad Pedagógica</span>
+            <span class="prog-lbl">Haz clic en cada tarjeta para desplegar su meta</span>
+          </div>
+          <h2 class="sec-title">Objetivos de Aprendizaje</h2>
+          <p class="sec-desc">Explora las metas formativas que orientan esta ruta gamificada de comprensión lectora (haz clic en las tarjetas interactivas):</p>
+          <div class="interactive-grid">${cardsHtml}</div>
+          <div class="nav-footer-row">
+            <button class="btn-3d sec" onclick="goScreen(0)">⬅ Portada</button>
+            <button class="btn-3d" onclick="unlockAndGo(2)">Continuar a Criterios de Evaluación ➔</button>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ================= 2. CRITERIOS DE EVALUACIÓN (INTERACTIVO) ================= */
+    const evalTabs = [
+      {
+        id: 'momentos', label: '📌 Momentos Evaluativos',
+        title: 'Evaluación Diagnóstica, Formativa y Sumativa',
+        body: '<strong>1. Diagnóstica:</strong> Identifica saberes previos y brechas iniciales en los 3 niveles.<br/><strong>2. Formativa:</strong> Retroalimentación inmediata en cada reto gamificado (puntos, desbloqueo de fases, crecimiento del cactus y aparición de chivitos).<br/><strong>3. Sumativa:</strong> Evaluación final individual <em>La Escalera del Saber</em> contrastada con el diagnóstico.'
+      },
+      {
+        id: 'niveles', label: '📊 Criterios por Nivel',
+        title: 'Indicadores de Logro por Nivel de Lectura',
+        body: '<strong>• Nivel Literal:</strong> Ubica datos explícitos (quién, dónde, cuándo, qué) con exactitud.<br/><strong>• Nivel Inferencial:</strong> Conecta pistas textuales con saberes previos para deducir causas e intenciones.<br/><strong>• Nivel Crítico:</strong> Cuestiona mensajes persuasivos o publicitarios y sustenta su postura con argumentos.'
+      },
+      {
+        id: 'siee', label: '🏅 Escala SIEE (Interactiva)',
+        title: 'Sistema Institucional de Evaluación (SIEE)',
+        body: '<strong>• Superior (4.6 – 5.0):</strong> Dominio sobresaliente en los 3 niveles y argumentación crítica sólida.<br/><strong>• Alto (4.0 – 4.5):</strong> Buen desempeño literal e inferencial con valoración crítica coherente.<br/><strong>• Básico (3.0 – 3.9):</strong> Comprensión literal adecuada e inferencias iniciales en consolidación.<br/><strong>• Bajo (1.0 – 2.9):</strong> Requiere refuerzo guiado en lectura inferencial y crítica.'
+      }
+    ];
+    let activeEvalTab = 0;
+
+    function renderCriteria() {
+      const mount = document.getElementById('mainMount');
+      let tabsHtml = '';
+      evalTabs.forEach((t, idx) => {
+        tabsHtml += `<button class="tab-pill ${idx === activeEvalTab ? 'active' : ''}" onclick="setEvalTab(${idx})">${t.label}</button>`;
+      });
+      const cur = evalTabs[activeEvalTab];
+
+      mount.innerHTML = `
+        <div class="stage slide-anim">
+          <div class="section-header">
+            <span class="sec-pill" style="background:#0369a1;">Paso 2 • Evaluación del Aprendizaje</span>
+            <span class="prog-lbl">Explora las 3 pestañas interactivas</span>
+          </div>
+          <h2 class="sec-title">Criterios de Evaluación</h2>
+          <p class="sec-desc">Conoce cómo se valora tu avance como <strong>Agente de Letras</strong> a lo largo de toda la ruta gamificada:</p>
+          <div class="tab-row">${tabsHtml}</div>
+          <div class="info-panel">
+            <h3>${cur.title}</h3>
+            <p>${cur.body}</p>
+          </div>
+          <div class="nav-footer-row">
+            <button class="btn-3d sec" onclick="goScreen(1)">⬅ Objetivos</button>
+            <button class="btn-3d" onclick="unlockAndGo(3)">Continuar a Presentación de Fases (ADDIE) ➔</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function setEvalTab(idx) { activeEvalTab = idx; renderCriteria(); }
+
+    /* ================= 3. PRESENTACIÓN DE FASES — MODELO ADDIE (INTERACTIVO) ================= */
+    const addiePhases = [
+      {
+        letter: "A", name: "A • Análisis", color: "#334155",
+        title: "Fase 1 ADDIE: Análisis (Diagnóstico de brechas y contexto)",
+        body: "Caracterización del grupo 601, contexto sociocultural Wayuu e infraestructura tecnológica (BYOD). Identifica mediante la <strong>Prueba Diagnóstica</strong> la brecha entre el nivel literal y los niveles inferencial y crítico."
+      },
+      {
+        letter: "D", name: "D • Diseño", color: "#2563eb",
+        title: "Fase 2 ADDIE: Diseño (Secuencia didáctica y modelo TPACK)",
+        body: "Estructuración pedagógica por niveles de lectura (Solé y Cassany) bajo la narrativa de <em>Agente de Letras</em>, organizando 3 módulos progresivos con fases de Conceptualización, Inicio, Desarrollo y Cierre."
+      },
+      {
+        letter: "D", name: "D • Desarrollo", color: "#0d9488",
+        title: "Fase 3 ADDIE: Desarrollo (Ecosistema de Recursos Digitales)",
+        body: "Creación y ensamble del curso en <strong>Google Classroom</strong> con videos, infografías, <em>Froggy Jumps</em> (Educaplay), <em>Escape Rooms</em> (Genially), Kahoot!, Edpuzzle, Padlet, Google Forms y aplicativos web en GitHub (<em>Misión en La Guajira</em> y <em>La Escalera del Saber</em>)."
+      },
+      {
+        letter: "I", name: "I • Implementación", color: "#7c3aed",
+        title: "Fase 4 ADDIE: Implementación (Ejecución gamificada en aula)",
+        body: "Puesta en marcha de los 3 módulos interactivos (Literal, Inferencial y Crítico) articulando sesiones presenciales mediadas por TIC, trabajo colaborativo y práctica autónoma."
+      },
+      {
+        letter: "E", name: "E • Evaluación", color: "#d97706",
+        title: "Fase 5 ADDIE: Evaluación (Post-test La Escalera del Saber)",
+        body: "Valoración formativa continua y medición sumativa final en <em>La Escalera del Saber</em> sobre relatos de la tradición oral, cosmovisión Wayuu y póster cultural, contrastando el progreso frente al diagnóstico."
+      }
+    ];
+    let activeAddie = 0;
+
+    function renderAddieIntro() {
+      const mount = document.getElementById('mainMount');
+      let tabsHtml = '';
+      addiePhases.forEach((p, idx) => {
+        tabsHtml += `<button class="tab-pill ${idx === activeAddie ? 'active' : ''}" style="${idx === activeAddie ? `background:${p.color}; border-color:${p.color};` : ''}" onclick="setAddie(${idx})">${p.name}</button>`;
+      });
+      const cur = addiePhases[activeAddie];
+
+      mount.innerHTML = `
+        <div class="stage slide-anim">
+          <div class="section-header">
+            <span class="sec-pill" style="background:#15803d;">Paso 3 • Diseño Instruccional</span>
+            <span class="prog-lbl">Haz clic en cada fase del modelo ADDIE</span>
+          </div>
+          <h2 class="sec-title">Presentación de Fases: Modelo ADDIE y Ruta de Niveles</h2>
+          <p class="sec-desc">Este Recurso Educativo Digital aplica el <strong>modelo instruccional ADDIE</strong> para guiarte desde el Diagnóstico hasta el Post-test:</p>
+          <div class="tab-row">${tabsHtml}</div>
+          <div class="info-panel" style="border-left-color:${cur.color};">
+            <h3>${cur.title}</h3>
+            <p>${cur.body}</p>
+          </div>
+          <div class="stats-grid" style="margin:6px 0 10px;">
+            <div class="stat-tile"><div class="num" style="color:var(--c-diag); font-size:1rem;">📋 Fase 1</div><div class="lbl">Diagnóstico</div></div>
+            <div class="stat-tile"><div class="num" style="color:var(--c-lit); font-size:1rem;">📘 Fase 2</div><div class="lbl">Módulo Literal</div></div>
+            <div class="stat-tile"><div class="num" style="color:var(--c-inf); font-size:1rem;">🔍 Fase 3</div><div class="lbl">Módulo Inferencial</div></div>
+            <div class="stat-tile"><div class="num" style="color:var(--c-cri); font-size:1rem;">⚖️ Fase 4</div><div class="lbl">Módulo Crítico</div></div>
+            <div class="stat-tile"><div class="num" style="color:var(--c-post); font-size:1rem;">🏆 Fase 5</div><div class="lbl">Post-test</div></div>
+          </div>
+          <div class="nav-footer-row">
+            <button class="btn-3d sec" onclick="goScreen(2)">⬅ Criterios</button>
+            <button class="btn-3d green" onclick="unlockAndGo(4)">🚀 Iniciar Fase 1: Diagnóstico ➔</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function setAddie(idx) { activeAddie = idx; renderAddieIntro(); }
+
+    function unlockAndGo(scr) {
+      maxUnlocked = Math.max(maxUnlocked, scr);
+      goScreen(scr);
+    }
+
+    /* ================= 4. DIAGNÓSTICO (1 PREGUNTA POR PANTALLA + AUTO-AVANCE) ================= */
+    const diagData = [
+      {
+        level: "literal", tag: "Nivel Literal", color: "#2563eb",
+        readingTitle: "Relato 1: El Pájaro Come Almas",
+        reading: "En las noches oscuras de los montes cercanos a Barrancas, los abuelos relatan que un ave de plumaje negro y ojos brillantes vigila los caminos solitarios y se acerca a quienes caminan distraídos.",
+        q: "1. Según el relato, ¿de qué color es el plumaje del ave?",
+        opts: ["Plumaje gris con manchas blancas.", "Plumaje negro.", "Plumaje dorado.", "Plumaje rojo."],
+        ans: 1,
+        fb: "¡Exacto! El texto indica explícitamente que es un ave de plumaje negro."
+      },
+      {
+        level: "literal", tag: "Nivel Literal", color: "#2563eb",
+        readingTitle: "Relato 2: Amanecer en la Ranchería",
+        reading: "Al amanecer, Walekerü revisó el corral antes de que el sol calentara la arena. Contó doce chivitos junto al cardón y llenó dos tinajas con agua fresca del jagüey.",
+        q: "2. ¿De dónde obtuvo Walekerü el agua fresca para las tinajas?",
+        opts: ["Del jagüey.", "De un pozo del pueblo.", "Del río.", "De la lluvia."],
+        ans: 0,
+        fb: "¡Muy bien! El texto menciona literalmente el agua fresca del jagüey."
+      },
+      {
+        level: "inferencial", tag: "Nivel Inferencial", color: "#0d9488",
+        readingTitle: "Relato 3: La Nota en el Pupitre",
+        reading: "Mateo encontró un papel doblado que decía: 'No olvides hoy el cuaderno azul; sin él no podremos exponer en la segunda hora'. Mateo miró el reloj y salió corriendo hacia su casa.",
+        q: "3. ¿Qué se puede deducir de la reacción de Mateo?",
+        opts: ["Que no quería asistir a clase.", "Que olvidó el cuaderno azul en casa y aún tenía tiempo de buscarlo.", "Que el cuaderno estaba en su pupitre.", "Que la exposición se canceló."],
+        ans: 1,
+        fb: "¡Buena inferencia! Al mirar la hora y correr a casa, se deduce que lo olvidó allí."
+      },
+      {
+        level: "inferencial", tag: "Nivel Inferencial", color: "#0d9488",
+        readingTitle: "Relato 4: El Cardón del Desierto",
+        reading: "El guía señaló un cactus cardón lleno de frutos rojos y dijo: 'Cuando florece así, las aves nunca pasan hambre, pero solo quienes respetan el equilibrio del desierto saben aprovecharlo sin dañar la planta'.",
+        q: "4. ¿Cuál es la enseñanza implícita en las palabras del guía?",
+        opts: ["Que los frutos son venenosos.", "Que la naturaleza provee alimento si se cuida con respeto.", "Que las aves dañan el cactus.", "Que no se debe caminar por el desierto."],
+        ans: 1,
+        fb: "¡Correcto! Se infiere un mensaje de cuidado y aprovechamiento responsable."
+      },
+      {
+        level: "critico", tag: "Nivel Crítico", color: "#7c3aed",
+        readingTitle: "Texto 5: Anuncio 'Bebida Súper-Genio'",
+        reading: "Un cartel en redes asegura: '¡Toma Súper-Genio cada mañana y aprobarás todos tus exámenes en 24 horas sin estudiar ni leer libros!'.",
+        q: "5. Desde una lectura crítica, ¿cómo debes valorar este anuncio?",
+        opts: ["Aceptarlo porque es llamativo.", "Cuestionarlo porque usa publicidad engañosa con promesas imposibles.", "Reemplazar la lectura por bebidas.", "Creerlo porque está en redes sociales."],
+        ans: 1,
+        fb: "¡Excelente criterio! Identificaste la persuasión engañosa."
+      },
+      {
+        level: "critico", tag: "Nivel Crítico", color: "#7c3aed",
+        readingTitle: "Texto 6: Cadena sin fuente oficial",
+        reading: "Un mensaje reenviado dice: 'Mañana no hay clases en ningún colegio del país, compártelo ya antes de que borren este aviso'. No incluye fecha ni entidad oficial.",
+        q: "6. ¿Cuál es la acción más crítica y responsable frente a ese mensaje?",
+        opts: ["Reenviarlo inmediatamente a todos.", "Verificar la información en fuentes oficiales antes de creerla o compartirla.", "Faltar a clases sin preguntar.", "Asumir que es verdad porque pide rapidez."],
+        ans: 1,
+        fb: "¡Muy bien! Verificar fuentes evita la desinformación."
+      }
+    ];
+    const diagState = { idx: 0, done: false, score: { literal: 0, inferencial: 0, critico: 0 } };
+
+    function renderDiag() {
+      const mount = document.getElementById('mainMount');
+      if (diagState.done) {
+        const tot = diagState.score.literal + diagState.score.inferencial + diagState.score.critico;
+        const pct = Math.round((tot / diagData.length) * 100);
+        mount.innerHTML = `
+          <div class="stage slide-anim" style="text-align:center;">
+            <div style="font-size:2.3rem; margin-bottom:4px;">📋</div>
+            <h2 class="sec-title">¡Diagnóstico Completado!</h2>
+            <p class="sec-desc">Ya conoces tu punto de partida. Se ha desbloqueado el <strong>Módulo 1: Nivel Literal</strong>.</p>
+            <div class="stats-grid">
+              <div class="stat-tile"><div class="num" style="color:var(--c-diag);">${tot}/${diagData.length} (${pct}%)</div><div class="lbl">Puntaje Diagnóstico</div></div>
+              <div class="stat-tile"><div class="num" style="color:var(--c-lit);">${diagState.score.literal}/2</div><div class="lbl">Nivel Literal</div></div>
+              <div class="stat-tile"><div class="num" style="color:var(--c-inf);">${diagState.score.inferencial}/2</div><div class="lbl">Nivel Inferencial</div></div>
+              <div class="stat-tile"><div class="num" style="color:var(--c-cri);">${diagState.score.critico}/2</div><div class="lbl">Nivel Crítico</div></div>
+            </div>
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+              <button class="btn-3d green" onclick="unlockAndGo(5)">📘 Avanzar al Módulo 1: Nivel Literal ➔</button>
+              <button class="btn-3d sec" onclick="resetDiag()">🔄 Repetir Diagnóstico</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const item = diagData[diagState.idx];
+      const pct = Math.round(((diagState.idx + 1) / diagData.length) * 100);
+      mount.innerHTML = `
+        <div class="stage slide-anim">
+          <div class="section-header">
+            <span class="sec-pill" style="background:${item.color};">Diagnóstico • ${item.tag}</span>
+            <div class="prog-wrap">
+              <span class="prog-lbl">Pregunta ${diagState.idx + 1} / ${diagData.length}</span>
+              <div class="prog-track"><div class="prog-fill" style="width:${pct}%; background:${item.color};"></div></div>
+            </div>
+          </div>
+          <div class="story-box">
+            <div class="s-title">${item.readingTitle}</div>
+            <p>${item.reading}</p>
+          </div>
+          <div class="q-heading">${item.q}</div>
+          <div class="options-grid" id="dOpts"></div>
+          <div class="feedback-bar" id="dFb">
+            <span id="dFbTxt"></span>
+            <button class="btn-3d" style="padding:6px 12px; font-size:0.75rem;" onclick="nextDiag()">Siguiente ➔</button>
+          </div>
+        </div>
+      `;
+
+      const box = document.getElementById('dOpts');
+      item.opts.forEach((txt, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt-card';
+        b.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + i)}</span><span>${txt}</span>`;
+        b.onclick = () => checkDiag(i);
+        box.appendChild(b);
+      });
+    }
+
+    function checkDiag(i) {
+      const item = diagData[diagState.idx];
+      const cards = document.querySelectorAll('#dOpts .opt-card');
+      cards.forEach(c => c.disabled = true);
+      const fb = document.getElementById('dFb');
+      const txt = document.getElementById('dFbTxt');
+      if (i === item.ans) {
+        cards[i].classList.add('correct');
+        diagState.score[item.level]++;
+        fb.className = 'feedback-bar show ok';
+        txt.textContent = '✅ ' + item.fb;
+      } else {
+        cards[i].classList.add('wrong');
+        cards[item.ans].classList.add('correct');
+        fb.className = 'feedback-bar show err';
+        txt.textContent = `❌ Era la ${String.fromCharCode(65 + item.ans)}. ${item.fb}`;
+      }
+      stopTimers();
+      autoTimer = setTimeout(nextDiag, 1900);
+    }
+
+    function nextDiag() {
+      stopTimers();
+      if (diagState.idx < diagData.length - 1) diagState.idx++;
+      else {
+        diagState.done = true;
+        maxUnlocked = Math.max(maxUnlocked, 5);
+        updateRouteBar();
+      }
+      renderDiag();
+    }
+
+    function resetDiag() {
+      stopTimers();
+      diagState.idx = 0;
+      diagState.done = false;
+      diagState.score = { literal: 0, inferencial: 0, critico: 0 };
+      renderDiag();
+    }
+
+    /* ================= 5, 6, 7. MÓDULOS LITERAL, INFERENCIAL Y CRÍTICO ================= */
+    const modules = {
+      1: {
+        name: "Módulo 1: Nivel Literal", unlockedPhase: 0, phase: 0, qIdx: 0,
+        phases: [
+          {
+            short: "0. Concepto", label: "0. Conceptualización", color: "#475569",
+            title: "Conceptualización: ¿Qué es el Nivel Literal?",
+            readingTitle: "Cápsula Conceptual (Google Classroom)",
+            reading: "En la lectura literal recuperamos la información explícita del texto: quiénes son los personajes, dónde y cuándo ocurren los hechos y qué acciones suceden exactamente, sin inventar ni suponer datos externos.",
+            qs: []
+          },
+          {
+            short: "1. Inicio", label: "1. Inicio • Froggy Jumps", color: "#0284c7",
+            title: "Reto de Inicio: Froggy Jumps (Educaplay)",
+            readingTitle: "Activación de saberes",
+            reading: "Antes de leer un relato completo, un Agente de Letras reconoce qué preguntas buscan datos explícitos dentro del texto.",
+            qs: [{
+              q: "¿Cuál de estas preguntas corresponde al nivel de lectura literal?",
+              opts: ["¿Qué opinas sobre la actitud del protagonista?", "¿En qué lugar y momento exacto ocurrió la historia?", "¿Qué crees que pasará diez años después?", "¿Por qué el autor eligió ese título?"],
+              ans: 1, fb: "¡Salto correcto! Preguntar por lugar y momento explícitos es lectura literal."
+            }]
+          },
+          {
+            short: "2. Desarrollo", label: "2. Desarrollo • Escape Room", color: "#ea580c",
+            title: "Escape Room: Código Secreto – Operación Ojo de Águila (Genially)",
+            readingTitle: "Fragmento: 'Es la pura verdad' (H. C. Andersen)",
+            reading: "Una gallina blanca perdió una sola pluma al acicalarse en el gallinero. Al comentarlo con su vecina, la historia pasó de rama en rama hasta convertirse en el rumor de que cinco gallinas se habían desplumado por completo.",
+            qs: [
+              {
+                q: "Pista 1 de 2: ¿Cuántas plumas perdió realmente la gallina blanca al inicio?",
+                opts: ["Cinco plumas.", "Una sola pluma.", "Diez plumas.", "Ninguna pluma."],
+                ans: 1, fb: "¡Dígito 1 descifrado! El texto indica literalmente una sola pluma."
+              },
+              {
+                q: "Pista 2 de 2: ¿En qué se transformó el rumor al final del fragmento?",
+                opts: ["En que cinco gallinas se habían desplumado por completo.", "En que el gallinero se cerró.", "En que la gallina voló lejos.", "En que cayó una tormenta."],
+                ans: 0, fb: "¡Caja fuerte abierta! Recuperaste el dato explícito con precisión."
+              }
+            ]
+          },
+          {
+            short: "3. Cierre", label: "3. Cierre • Kahoot!", color: "#16a34a",
+            title: "Reto de Cierre: Mito “El Pájaro Come Almas” (Kahoot!)",
+            readingTitle: "Relato de la tradición oral",
+            reading: "Cuentan los mayores que el Pájaro Come Almas emite un silbido agudo cuando cae la medianoche y sobrevuela los techos de las casas donde nadie ha escuchado las advertencias familiares.",
+            qs: [{
+              q: "¿En qué momento exacto emite su silbido el ave según el fragmento?",
+              opts: ["Al mediodía.", "Cuando cae la medianoche.", "Al amanecer.", "Al caer la tarde."],
+              ans: 1, fb: "¡Módulo 1 superado! Has desbloqueado el Nivel Inferencial."
+            }]
+          }
+        ]
+      },
+      2: {
+        name: "Módulo 2: Nivel Inferencial", unlockedPhase: 0, phase: 0, qIdx: 0, cactus: 0,
+        phases: [
+          {
+            short: "0. Concepto", label: "0. Conceptualización", color: "#475569",
+            title: "Conceptualización: ¿Qué es el Nivel Inferencial?",
+            readingTitle: "Cápsula Conceptual (Google Classroom)",
+            reading: "Leer inferencialmente significa 'leer entre líneas': conectar las pistas del texto con nuestros saberes previos para deducir causas, emociones, intenciones o consecuencias que no están escritas directamente.",
+            qs: []
+          },
+          {
+            short: "1. Inicio", label: "1. Inicio • ¡Responde Rápido!", color: "#0284c7",
+            title: "Reto de Inicio: ¡Responde Rápido! (Edpuzzle)",
+            readingTitle: "Situación cotidiana",
+            reading: "Al llegar al salón, Laura cerró su paraguas empapado, sacudió sus zapatos llenos de barro y encendió el ventilador para secar su mochila.",
+            qs: [{
+              q: "¿Qué se puede inferir sobre el clima afuera del colegio?",
+              opts: ["Hacía un sol intenso y seco.", "Estaba lloviendo fuerte.", "Había una tormenta de arena.", "Estaba nevando."],
+              ans: 1, fb: "¡Deducción acertada! El paraguas empapado y el barro confirman lluvia fuerte."
+            }]
+          },
+          {
+            short: "2. Desarrollo", label: "2. Desarrollo • Detective", color: "#ea580c",
+            title: "Escape Room: Detective Inferencial (Genially)",
+            readingTitle: "Sala del Detective",
+            reading: "Cuando anunciaron el ganador del concurso de cuentos, Tomás bajó la mirada, guardó lentamente sus hojas y salió sin hablar, aunque minutos después volvió para darle la mano a su compañera.",
+            qs: [{
+              q: "¿Qué emoción sintió Tomás al inicio y qué valor demostró al regresar?",
+              opts: ["Alegría inicial y luego enojo.", "Decepción al no ganar, pero respeto y deportividad al felicitar.", "Indiferencia total.", "Miedo de perder sus hojas."],
+              ans: 1, fb: "¡Pista resuelta! Dedujiste las emociones y actitudes implícitas."
+            }]
+          },
+          {
+            short: "3. Cierre", label: "3. Cierre • Misión La Guajira", color: "#16a34a",
+            title: "Misión en La Guajira: el cactus y el corral (GitHub)",
+            readingTitle: "Travesía Wayuu — Cada acierto hace crecer el cactus y suma chivitos",
+            reading: "En la ranchería, la abuela tejió una mochila con figuras de olas y caminos largos antes del viaje de su nieto a la ciudad, diciéndole: 'Llévala siempre para que nunca olvides de dónde vienes'.",
+            isCactus: true,
+            qs: [
+              {
+                q: "Parada 1 de 2: ¿Qué simboliza la mochila que le entregó la abuela?",
+                opts: ["Solo un objeto para guardar cuadernos.", "El vínculo familiar, la identidad y las raíces culturales Wayuu.", "Un castigo por viajar.", "Un adorno sin significado."],
+                ans: 1, fb: "🌵 ¡Crece el cactus y llega un chivito al corral!"
+              },
+              {
+                q: "Parada 2 de 2: ¿Por qué la abuela tejió 'caminos largos' en la mochila?",
+                opts: ["Representan el recorrido de vida y el viaje de su nieto.", "Se quedó sin hilo de otro color.", "No sabía hacer otra figura.", "Para que pesara menos."],
+                ans: 0, fb: "🌵🐐 ¡El cactus floreció! Has desbloqueado el Nivel Crítico."
+              }
+            ]
+          }
+        ]
+      },
+      3: {
+        name: "Módulo 3: Nivel Crítico", unlockedPhase: 0, phase: 0, qIdx: 0,
+        phases: [
+          {
+            short: "0. Concepto", label: "0. Conceptualización", color: "#475569",
+            title: "Conceptualización: ¿Qué es el Nivel Crítico?",
+            readingTitle: "Cápsula Conceptual (Google Classroom)",
+            reading: "La lectura crítica nos permite evaluar la intención comunicativa de un texto o anuncio, diferenciar hechos comprobables de opiniones o exageraciones y sustentar una postura propia con argumentos sólidos.",
+            qs: []
+          },
+          {
+            short: "1. Inicio", label: "1. Inicio • Muro Crítico", color: "#0284c7",
+            title: "Observemos los anuncios: Muro Crítico (Padlet)",
+            readingTitle: "Anuncio: '¡Últimos 3 minutos!'",
+            reading: "Un aviso parpadeante dice: '¡COMPRA YA ESTOS TENIS MÁGICOS! Solo quedan 2 pares en todo el planeta. ¡Si no compras hoy, perderás tu única oportunidad!'.",
+            qs: [{
+              q: "¿Qué técnica de persuasión emplea este anuncio?",
+              opts: ["Información científica verificada.", "Urgencia y escasez artificial para presionar una compra impulsiva.", "Un consejo neutral de salud.", "Una reseña literaria."],
+              ans: 1, fb: "¡Exacto! Detectaste la presión por urgencia y escasez artificial."
+            }]
+          },
+          {
+            short: "2. Desarrollo", label: "2. Desarrollo • Aventureros", color: "#ea580c",
+            title: "Aventureros Críticos: Neuro-Flash y Brain-Max (Genially)",
+            readingTitle: "Comercial: 'El milagro en una botella'",
+            reading: "El anuncio de 'Brain-Max' muestra a un actor con bata blanca afirmando: '9 de cada 10 genios beben Brain-Max para memorizar libros enteros en 5 minutos'. No cita ningún estudio real.",
+            qs: [{
+              q: "¿Qué recurso persuasivo engañoso utiliza el comercial?",
+              opts: ["Falsa autoridad (actor con bata blanca) y promesas sin evidencia.", "Un reporte médico oficial.", "Una encuesta escolar real.", "Una noticia periodística."],
+              ans: 0, fb: "¡Brillante análisis! Identificaste el uso de falsa autoridad."
+            }]
+          },
+          {
+            short: "3. Cierre", label: "3. Cierre • Tribunal Barrancas", color: "#16a34a",
+            title: "Tribunal de Barrancas: Misión de Lectura Crítica (Google Forms)",
+            readingTitle: "Caso final del Tribunal",
+            reading: "Un creador de contenido afirma: 'Leer libros largos es una pérdida de tiempo; con ver resúmenes de 15 segundos ya sabes todo lo necesario para la vida'.",
+            qs: [{
+              q: "Como juez crítico, ¿cuál es el argumento más sólido para refutar esa idea?",
+              opts: ["Porque los libros tienen muchas páginas.", "Porque los resúmenes omiten matices, vocabulario y contexto necesarios para inferir y argumentar.", "Porque los videos no sirven para nada.", "Porque leer es obligatorio."],
+              ans: 1, fb: "⚖️ ¡Módulo 3 superado! Has desbloqueado el Post-test: La Escalera del Saber."
+            }]
+          }
+        ]
+      }
+    };
+
+    function renderModule(modId) {
+      const mod = modules[modId];
+      const ph = mod.phases[mod.phase];
+      const mount = document.getElementById('mainMount');
+
+      let dotsHtml = '<div class="phase-dots">';
+      mod.phases.forEach((p, idx) => {
+        const open = freeMode || idx <= mod.unlockedPhase;
+        dotsHtml += `<button class="p-chip ph-${idx} ${idx === mod.phase ? 'active' : ''} ${!open ? 'locked' : ''}" onclick="jumpPhase(${modId}, ${idx})">${!open ? '🔒 ' : ''}${p.short}</button>`;
+      });
+      dotsHtml += '</div>';
+
+      if (ph.qs.length === 0) {
+        mount.innerHTML = `
+          <div class="stage slide-anim">
+            ${dotsHtml}
+            <div class="section-header">
+              <span class="sec-pill" style="background:${ph.color};">${ph.label}</span>
+              <span class="prog-lbl">${mod.name}</span>
+            </div>
+            <div class="q-heading">${ph.title}</div>
+            <div class="story-box">
+              <div class="s-title">${ph.readingTitle}</div>
+              <p>${ph.reading}</p>
+            </div>
+            <div class="nav-footer-row">
+              <span></span>
+              <button class="btn-3d" onclick="advanceModule(${modId})">✅ Comprendido, ir a Fase 1 ➔</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const qObj = ph.qs[mod.qIdx];
+      mount.innerHTML = `
+        <div class="stage slide-anim">
+          ${dotsHtml}
+          <div class="section-header">
+            <span class="sec-pill" style="background:${ph.color};">${ph.label}</span>
+            <span class="prog-lbl">Reto ${mod.qIdx + 1} / ${ph.qs.length}</span>
+          </div>
+          ${ph.isCactus ? `<div class="gamif-banner"><span>🌵 Cardón: ${'🌵'.repeat(mod.cactus + 1)}</span><span>🐐 Chivitos en el corral: ${mod.cactus}/${ph.qs.length}</span></div>` : ''}
+          <div class="story-box">
+            <div class="s-title">${ph.readingTitle}</div>
+            <p>${ph.reading}</p>
+          </div>
+          <div class="q-heading">${qObj.q}</div>
+          <div class="options-grid" id="mOpts"></div>
+          <div class="feedback-bar" id="mFb">
+            <span id="mFbTxt"></span>
+            <button class="btn-3d" style="padding:6px 12px; font-size:0.75rem;" onclick="advanceModule(${modId})">Siguiente ➔</button>
+          </div>
+        </div>
+      `;
+
+      const box = document.getElementById('mOpts');
+      qObj.opts.forEach((txt, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt-card';
+        b.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + i)}</span><span>${txt}</span>`;
+        b.onclick = () => checkModule(modId, i);
+        box.appendChild(b);
+      });
+    }
+
+    function jumpPhase(modId, pIdx) {
+      const mod = modules[modId];
+      if (!freeMode && pIdx > mod.unlockedPhase) return;
+      stopTimers();
+      mod.phase = pIdx;
+      mod.qIdx = 0;
+      renderModule(modId);
+    }
+
+    function checkModule(modId, i) {
+      const mod = modules[modId];
+      const ph = mod.phases[mod.phase];
+      const qObj = ph.qs[mod.qIdx];
+      const cards = document.querySelectorAll('#mOpts .opt-card');
+      cards.forEach(c => c.disabled = true);
+      const fb = document.getElementById('mFb');
+      const txt = document.getElementById('mFbTxt');
+      if (i === qObj.ans) {
+        cards[i].classList.add('correct');
+        if (ph.isCactus) mod.cactus = Math.min(ph.qs.length, mod.cactus + 1);
+        fb.className = 'feedback-bar show ok';
+        txt.textContent = '✅ ' + qObj.fb;
+      } else {
+        cards[i].classList.add('wrong');
+        cards[qObj.ans].classList.add('correct');
+        fb.className = 'feedback-bar show err';
+        txt.textContent = `❌ Era la ${String.fromCharCode(65 + qObj.ans)}. ${qObj.fb}`;
+      }
+      stopTimers();
+      autoTimer = setTimeout(() => advanceModule(modId), 1900);
+    }
+
+    function advanceModule(modId) {
+      stopTimers();
+      const mod = modules[modId];
+      const ph = mod.phases[mod.phase];
+      if (ph.qs.length > 0 && mod.qIdx < ph.qs.length - 1) {
+        mod.qIdx++;
+        renderModule(modId);
+      } else if (mod.phase < mod.phases.length - 1) {
+        mod.unlockedPhase = Math.max(mod.unlockedPhase, mod.phase + 1);
+        mod.phase++;
+        mod.qIdx = 0;
+        renderModule(modId);
+      } else {
+        unlockAndGo(modId + 5);
+      }
+    }
+
+    /* ================= 8. POST-TEST: LA ESCALERA DEL SABER + CIERRE CLASSROOM ================= */
+    const postData = [
+      {
+        step: "Peldaño 1", level: "literal", tag: "Nivel Literal", color: "#2563eb",
+        readingTitle: "Texto 1: El Hombre Caimán",
+        reading: "Según la leyenda del Caribe colombiano, Saúl Montenegro bebía una pócima preparada por un brujo para transformarse en caimán y observar desde el río Magdalena a las bañistas de Plato.",
+        q: "¿Qué utilizaba Saúl Montenegro para transformarse en caimán?",
+        opts: ["Una pócima preparada por un brujo.", "Un sombrero mágico.", "Un canto nocturno.", "Un amuleto de oro."],
+        ans: 0, fb: "¡Peldaño 1 superado! Dato explícito localizado con exactitud."
+      },
+      {
+        step: "Peldaño 2", level: "inferencial", tag: "Nivel Inferencial", color: "#0d9488",
+        readingTitle: "Texto 2: La Madremonte",
+        reading: "Quienes talan los bosques sin medida o desvían los arroyos aseguran escuchar un bramido entre la niebla espesa; enseguida, los senderos desaparecen hasta que prometen respetar el monte.",
+        q: "¿Qué propósito cumple la leyenda de La Madremonte en la comunidad?",
+        opts: ["Asustar sin motivo.", "Promover el respeto y la protección de los bosques y fuentes de agua.", "Enseñar a construir caminos.", "Explicar cómo cazar en el monte."],
+        ans: 1, fb: "¡Peldaño 2 superado! Excelente inferencia ecológica y cultural."
+      },
+      {
+        step: "Peldaño 3", level: "inferencial", tag: "Nivel Inferencial", color: "#0d9488",
+        readingTitle: "Texto 3: El Origen del Arcoíris (Mito Wayuu)",
+        reading: "En la cosmovisión Wayuu, el arcoíris enlaza el cielo y la tierra tras la lluvia, recordando el equilibrio entre los seres humanos, los animales del desierto y la naturaleza que los sostiene.",
+        q: "¿Qué relación con la naturaleza se deduce de este mito Wayuu?",
+        opts: ["Armonía e interdependencia entre la comunidad y su entorno.", "Que el desierto nunca necesita lluvia.", "Que el cielo y la tierra están en guerra.", "Que solo importa el clima."],
+        ans: 0, fb: "¡Peldaño 3 superado! Dedujiste el valor de armonía Wayuu."
+      },
+      {
+        step: "Peldaño 4", level: "critico", tag: "Nivel Crítico", color: "#7c3aed",
+        readingTitle: "Texto 4: La Llorona",
+        reading: "Muchas leyendas tradicionales como La Llorona se transmiten de generación en generación en reuniones familiares, adaptándose a la identidad de cada región del país.",
+        q: "¿Por qué es valioso conservar y leer estas leyendas en la escuela?",
+        opts: ["Porque son cortas.", "Porque preservan la memoria oral, la identidad cultural y permiten analizar valores.", "Porque reemplazan otras materias.", "Porque todas terminan igual."],
+        ans: 1, fb: "¡Peldaño 4 superado! Sólida valoración crítica."
+      },
+      {
+        step: "Peldaño 5", level: "critico", tag: "Nivel Crítico", color: "#7c3aed",
+        readingTitle: "Texto 5: Póster Cultural (Texto Discontinuo)",
+        reading: "PÓSTER: 'Festival de Lectura y Tradición Oral en Barrancas — Entrada libre. Sábado 8:00 a.m. en la Plaza Principal. Trae tu libro favorito para intercambiar y participa en el taller de mitos Wayuu'.",
+        q: "¿Cuál es la intención principal de este póster?",
+        opts: ["Vender boletas costosas.", "Convocar gratuitamente a la comunidad para fomentar la lectura y la cultura local.", "Prohibir el ingreso de estudiantes.", "Promocionar una tienda privada."],
+        ans: 1, fb: "🏆 ¡Cima alcanzada en La Escalera del Saber!"
+      }
+    ];
+    const postState = { idx: 0, done: false, score: { literal: 0, inferencial: 0, critico: 0 } };
+
+    function renderPost() {
+      const mount = document.getElementById('mainMount');
+      let ladderHtml = '<div class="ladder-row">';
+      postData.forEach((it, i) => {
+        const done = postState.done || i < postState.idx;
+        const cur = !postState.done && i === postState.idx;
+        ladderHtml += `<div class="ladder-cell ${done ? 'done' : cur ? 'current' : ''}">${done ? '🏆 ' : ''}${it.step}</div>`;
+      });
+      ladderHtml += '</div>';
+
+      if (postState.done) {
+        const diagTot = diagState.score.literal + diagState.score.inferencial + diagState.score.critico;
+        const diagPct = Math.round((diagTot / diagData.length) * 100);
+        const postTot = postState.score.literal + postState.score.inferencial + postState.score.critico;
+        const postPct = Math.round((postTot / postData.length) * 100);
+        const siee = (postPct / 20).toFixed(1);
+        let cat = "Bajo";
+        if (siee >= 4.6) cat = "Superior";
+        else if (siee >= 4.0) cat = "Alto";
+        else if (siee >= 3.0) cat = "Básico";
+
+        mount.innerHTML = `
+          <div class="stage slide-anim" style="text-align:center;">
+            ${ladderHtml}
+            <div style="font-size:2.4rem; margin-bottom:4px;">🏆</div>
+            <h2 class="sec-title">¡Misión Cumplida en La Escalera del Saber!</h2>
+            <p class="sec-desc">Completaste todas las fases del Recurso Educativo Digital. Continúa y explora todos los recursos del curso en <strong>Google Classroom</strong>:</p>
+            <div class="stats-grid">
+              <div class="stat-tile"><div class="num" style="color:var(--c-diag);">${diagPct}%</div><div class="lbl">Diagnóstico</div></div>
+              <div class="stat-tile"><div class="num" style="color:var(--c-post);">${postPct}% (${postTot}/${postData.length})</div><div class="lbl">Post-test</div></div>
+              <div class="stat-tile"><div class="num" style="color:var(--ok);">${siee} • ${cat}</div><div class="lbl">Valoración SIEE</div></div>
+            </div>
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+              <a class="btn-3d gold" style="font-size:0.95rem; padding:12px 24px;" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
+                🎓 Ir al Curso en Google Classroom (Código: umxduefs)
+              </a>
+              <button class="btn-3d sec" onclick="resetPost()">🔄 Repetir Post-test</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const item = postData[postState.idx];
+      const pct = Math.round(((postState.idx + 1) / postData.length) * 100);
+      mount.innerHTML = `
+        <div class="stage slide-anim">
+          ${ladderHtml}
+          <div class="section-header">
+            <span class="sec-pill" style="background:${item.color};">${item.step} • ${item.tag}</span>
+            <div class="prog-wrap">
+              <span class="prog-lbl">${postState.idx + 1} / ${postData.length}</span>
+              <div class="prog-track"><div class="prog-fill" style="width:${pct}%; background:var(--c-post);"></div></div>
+            </div>
+          </div>
+          <div class="story-box">
+            <div class="s-title">${item.readingTitle}</div>
+            <p>${item.reading}</p>
+          </div>
+          <div class="q-heading">${item.q}</div>
+          <div class="options-grid" id="pOpts"></div>
+          <div class="feedback-bar" id="pFb">
+            <span id="pFbTxt"></span>
+            <button class="btn-3d" style="padding:6px 12px; font-size:0.75rem;" onclick="nextPost()">Siguiente ➔</button>
+          </div>
+        </div>
+      `;
+
+      const box = document.getElementById('pOpts');
+      item.opts.forEach((txt, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt-card';
+        b.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + i)}</span><span>${txt}</span>`;
+        b.onclick = () => checkPost(i);
+        box.appendChild(b);
+      });
+    }
+
+    function checkPost(i) {
+      const item = postData[postState.idx];
+      const cards = document.querySelectorAll('#pOpts .opt-card');
+      cards.forEach(c => c.disabled = true);
+      const fb = document.getElementById('pFb');
+      const txt = document.getElementById('pFbTxt');
+      if (i === item.ans) {
+        cards[i].classList.add('correct');
+        postState.score[item.level]++;
+        fb.className = 'feedback-bar show ok';
+        txt.textContent = '✅ ' + item.fb;
+      } else {
+        cards[i].classList.add('wrong');
+        cards[item.ans].classList.add('correct');
+        fb.className = 'feedback-bar show err';
+        txt.textContent = `❌ Era la ${String.fromCharCode(65 + item.ans)}. ${item.fb}`;
+      }
+      stopTimers();
+      autoTimer = setTimeout(nextPost, 1900);
+    }
+
+    function nextPost() {
+      stopTimers();
+      if (postState.idx < postData.length - 1) postState.idx++;
+      else postState.done = true;
+      renderPost();
+    }
+
+    function resetPost() {
+      stopTimers();
+      postState.idx = 0;
+      postState.done = false;
+      postState.score = { literal: 0, inferencial: 0, critico: 0 };
+      renderPost();
+    }
+
+    /* ================= INICIALIZACIÓN ================= */
+    goScreen(0);
+  </script>
+</body>
+</html>
