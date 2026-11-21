@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RED Completo: Leer, Inferir y Argumentar — Ruta Gamificada</title>
+  <style>
+    :root {
+      /* Colores distintos por nivel/etapa */
+      --diag-main: #334155;
+      --diag-light: #f1f5f9;
+      --diag-border: #94a3b8;
+
+      --lit-main: #1d4ed8;
+      --lit-light: #eff6ff;
+      --lit-border: #93c5fd;
+
+      --inf-main: #0f766e;
+      --inf-light: #f0fdfa;
+      --inf-border: #5eead4;
+
+      --cri-main: #6d28d9;
+      --cri-light: #f5f3ff;
+      --cri-border: #c4b5fd;
+
+      --post-main: #b45309;
+      --post-light: #fffbeb;
+      --post-border: #fcd34d;
+
+      /* Colores distintos por fase interna (Conceptualización, Inicio, Desarrollo, Cierre) */
+      --f-concept: #475569;
+      --f-inicio: #0284c7;
+      --f-desarrollo: #d97706;
+      --f-cierre: #15803d;
+
+      --bg: #f8fafc;
+      --white: #ffffff;
+      --text: #1e293b;
+      --muted: #475569;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      line-height: 1.5;
+      padding: 14px;
+    }
+
+    .red-shell {
+      max-width: 980px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.16);
+      overflow: hidden;
+      border: 2px solid #0f2547;
+    }
+
+    /* ENCABEZADO */
+    .top-header {
+      background: linear-gradient(125deg, #0f2547 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 4px solid #f59e0b;
+    }
+    .top-header .kicker {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #fde68a;
+      font-weight: 700;
+    }
+    .top-header h1 {
+      font-size: 1.25rem;
+      margin: 3px 0;
+    }
+    .top-header p {
+      font-size: 0.84rem;
+      color: #cbd5e1;
+    }
+    .btn-lms {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f59e0b;
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 0.84rem;
+      padding: 9px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .btn-lms:hover { background: #d97706; color: #fff; transform: translateY(-1px); }
+
+    /* BARRA DE NAVEGACIÓN POR NIVELES (5 COLORES DISTINTOS) */
+    .level-nav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      padding: 12px 16px;
+      background: #f1f5f9;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    @media (max-width: 720px) {
+      .level-nav { grid-template-columns: repeat(2, 1fr); }
+    }
+    .lvl-btn {
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 10px 8px;
+      cursor: pointer;
+      background: #fff;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .lvl-btn small { font-weight: 600; font-size: 0.7rem; opacity: 0.85; }
+
+    /* Colores individuales de botones */
+    .lvl-btn.c-diag { color: var(--diag-main); border-color: var(--diag-border); }
+    .lvl-btn.c-diag.active, .lvl-btn.c-diag:hover { background: var(--diag-main); color: #fff; }
+
+    .lvl-btn.c-lit { color: var(--lit-main); border-color: var(--lit-border); }
+    .lvl-btn.c-lit.active, .lvl-btn.c-lit:hover { background: var(--lit-main); color: #fff; }
+
+    .lvl-btn.c-inf { color: var(--inf-main); border-color: var(--inf-border); }
+    .lvl-btn.c-inf.active, .lvl-btn.c-inf:hover { background: var(--inf-main); color: #fff; }
+
+    .lvl-btn.c-cri { color: var(--cri-main); border-color: var(--cri-border); }
+    .lvl-btn.c-cri.active, .lvl-btn.c-cri:hover { background: var(--cri-main); color: #fff; }
+
+    .lvl-btn.c-post { color: var(--post-main); border-color: var(--post-border); }
+    .lvl-btn.c-post.active, .lvl-btn.c-post:hover { background: var(--post-main); color: #fff; }
+
+    /* PANELES DE CONTENIDO */
+    .panel { display: none; padding: 22px; animation: fadeIn 0.25s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* BANNER DE CADA NIVEL */
+    .level-banner {
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 18px;
+      border-left: 6px solid;
+    }
+    .banner-diag { background: var(--diag-light); border-color: var(--diag-main); }
+    .banner-lit  { background: var(--lit-light);  border-color: var(--lit-main); }
+    .banner-inf  { background: var(--inf-light);  border-color: var(--inf-main); }
+    .banner-cri  { background: var(--cri-light);  border-color: var(--cri-main); }
+    .banner-post { background: var(--post-light); border-color: var(--post-main); }
+
+    .level-banner h2 { font-size: 1.2rem; margin-bottom: 4px; }
+    .level-banner p  { font-size: 0.9rem; color: var(--muted); }
+
+    /* DIFERENCIACIÓN DE FASES INTERNAS */
+    .phase-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: #fff;
+      display: inline-block;
+    }
+    .p-concept { background: var(--f-concept); }
+    .p-inicio { background: var(--f-inicio); }
+    .p-desarrollo { background: var(--f-desarrollo); }
+    .p-cierre { background: var(--f-cierre); }
+
+    .phases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .phase-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      border-top: 5px solid;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .phase-card.concept { border-top-color: var(--f-concept); background: #f8fafc; }
+    .phase-card.inicio { border-top-color: var(--f-inicio); }
+    .phase-card.desarrollo { border-top-color: var(--f-desarrollo); }
+    .phase-card.cierre { border-top-color: var(--f-cierre); }
+
+    .phase-card .phase-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .phase-card.concept .phase-label { color: var(--f-concept); }
+    .phase-card.inicio .phase-label { color: var(--f-inicio); }
+    .phase-card.desarrollo .phase-label { color: var(--f-desarrollo); }
+    .phase-card.cierre .phase-label { color: var(--f-cierre); }
+
+    .phase-card h3 { font-size: 0.96rem; color: #0f172a; }
+    .phase-card p  { font-size: 0.83rem; color: var(--muted); }
+    .tool-chip {
+      margin-top: auto;
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* MÉTRICAS Y BARRAS */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .m-box {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+    .m-box .big { font-size: 1.55rem; font-weight: 800; }
+    .m-box .sub { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+
+    .bars-wrap { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+    .bar-row label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .track {
+      height: 14px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    /* MINI RETO INTERACTIVO POR MÓDULO */
+    .quiz-box {
+      background: #f8fafc;
+      border: 2px dashed #94a3b8;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .quiz-box h4 { font-size: 0.94rem; margin-bottom: 6px; color: #0f172a; }
+    .quiz-box .q-stem { font-size: 0.88rem; margin-bottom: 10px; color: var(--text); }
+    .q-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+    .q-btn {
+      background: #fff;
+      border: 1px solid #94a3b8;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .q-btn:hover { background: #e2e8f0; }
+    .q-btn.ok { background: #dcfce7; border-color: #16a34a; color: #14532d; }
+    .q-btn.err { background: #fee2e2; border-color: #dc2626; color: #7f1d1d; }
+    .q-msg {
+      margin-top: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    /* PIE DE PÁGINA */
+    footer {
+      background: #0f2547;
+      color: #cbd5e1;
+      padding: 12px 22px;
+      font-size: 0.76rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="red-shell">
+    <header class="top-header">
+      <div>
+        <div class="kicker">RED Interactivo Completo • I.E.T. Remedios Solano (Barrancas, La Guajira) • Grado 601</div>
+        <h1>“Leer, inferir y argumentar: ruta gamificada para fortalecer la comprensión lectora”</h1>
+        <p>Rol: <strong>Agente de Letras</strong> • LMS Google Classroom (<em>El desafío de un lector competente</em>) • Código: <strong>umxduefs</strong></p>
+      </div>
+      <a class="btn-lms" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
+        🎓 Abrir Google Classroom
+      </a>
+    </header>
+
+    <!-- NAVEGACIÓN: CADA NIVEL / ETAPA CON UN COLOR DIFERENTE -->
+    <nav class="level-nav" role="tablist">
+      <button class="lvl-btn c-diag active" onclick="showPanel('diag', this)">
+        <span>📋 1. Diagnóstico</span>
+        <small>Línea base (54%)</small>
+      </button>
+      <button class="lvl-btn c-lit" onclick="showPanel('lit', this)">
+        <span>📘 2. Módulo 1</span>
+        <small>Nivel Literal</small>
+      </button>
+      <button class="lvl-btn c-inf" onclick="showPanel('inf', this)">
+        <span>🔍 3. Módulo 2</span>
+        <small>Nivel Inferencial</small>
+      </button>
+      <button class="lvl-btn c-cri" onclick="showPanel('cri', this)">
+        <span>⚖️ 4. Módulo 3</span>
+        <small>Nivel Crítico</small>
+      </button>
+      <button class="lvl-btn c-post" onclick="showPanel('post', this)">
+        <span>🏆 5. Post-test</span>
+        <small>La Escalera (77%)</small>
+      </button>
+    </nav>
+
+    <!-- ==================== PANEL 1: DIAGNÓSTICO ==================== -->
+    <section class="panel active" id="panel-diag">
+      <div class="level-banner banner-diag">
+        <h2 style="color:var(--diag-main);">Etapa 1: Fase Diagnóstica (13 de octubre de 2026)</h2>
+        <p>Aplicación impresa a <strong>30 estudiantes</strong> (de la muestra de 33 del grado 601) para caracterizar el estado inicial en los tres niveles de lectura.</p>
+      </div>
+
+      <div class="metrics-row">
+        <div class="m-box"><div class="big" style="color:var(--diag-main);">54%</div><div class="sub">Promedio general (Nota SIEE: 2,7 Bajo)</div></div>
+        <div class="m-box"><div class="big" style="color:var(--lit-main);">69%</div><div class="sub">Nivel Literal (103/150)</div></div>
+        <div class="m-box"><div class="big" style="color:var(--inf-main);">43%</div><div class="sub">Nivel Inferencial (51/120)</div></div>
+        <div class="m-box"><div class="big" style="color:var(--cri-main);">23%</div><div class="sub">Nivel Crítico (7/30)</div></div>
+      </div>
+
+      <div class="bars-wrap">
+        <div class="bar-row">
+          <label><span style="color:var(--lit-main);">Nivel Literal</span><span>69%</span></label>
+          <div class="track"><div class="fill" style="width:69%; background:var(--lit-main);"></div></div>
+        </div>
+        <div class="bar-row">
+          <label><span style="color:var(--inf-main);">Nivel Inferencial</span><span>43%</span></label>
+          <div class="track"><div class="fill" style="width:43%; background:var(--inf-main);"></div></div>
+        </div>
+        <div class="bar-row">
+          <label><span style="color:var(--cri-main);">Nivel Crítico</span><span>23%</span></label>
+          <div class="track"><div class="fill" style="width:23%; background:var(--cri-main);"></div></div>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <h4>🔎 Hallazgo clave del diagnóstico</h4>
+        <p class="q-stem">
+          Se identificó una brecha de <strong>46 puntos porcentuales</strong> entre el nivel literal (69%) y el nivel crítico (23%).
+          En la escala institucional (SIEE), el <strong>83%</strong> del grupo se ubicó en desempeño <strong>Bajo (53%)</strong> y <strong>Básico (30%)</strong>,
+          con 17% en Alto y 0% en Superior.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== PANEL 2: MÓDULO 1 LITERAL ==================== -->
+    <section class="panel" id="panel-lit">
+      <div class="level-banner banner-lit">
+        <h2 style="color:var(--lit-main);">Módulo 1: Nivel Literal — “Exploradores de información explícita”</h2>
+        <p>Sesiones 1 a 3 (14, 15 y 16 de octubre de 2026) • Propósito: localizar datos explícitos, personajes, lugares y hechos precisos.</p>
+      </div>
+
+      <div class="phase-legend">
+        <span class="pill p-concept">0. Conceptualización</span>
+        <span class="pill p-inicio">1. Fase de Inicio</span>
+        <span class="pill p-desarrollo">2. Fase de Desarrollo</span>
+        <span class="pill p-cierre">3. Fase de Cierre</span>
+      </div>
+
+      <div class="phases-grid">
+        <div class="phase-card concept">
+          <span class="phase-label">Fase 0 • Conceptualización</span>
+          <h3>Activación de saberes</h3>
+          <p>Video explicativo del profe Hermes e infografías diseñadas con Gemini IA dentro del aula virtual.</p>
+          <span class="tool-chip">Google Classroom + YouTube</span>
+        </div>
+        <div class="phase-card inicio">
+          <span class="phase-label">Fase 1 • Inicio (Prelectura)</span>
+          <h3>Froggy Jumps</h3>
+          <p>Juego interactivo de 5 preguntas conceptuales para reconocer las claves de la lectura literal.</p>
+          <span class="tool-chip">Educaplay</span>
+        </div>
+        <div class="phase-card desarrollo">
+          <span class="phase-label">Fase 2 • Desarrollo (Lectura)</span>
+          <h3>Escape Room: Código Secreto</h3>
+          <p><em>Operación ojo de águila</em> sobre el cuento <em>“Es la pura verdad”</em> de Hans Christian Andersen.</p>
+          <span class="tool-chip">Genially</span>
+        </div>
+        <div class="phase-card cierre">
+          <span class="phase-label">Fase 3 • Cierre (Poslectura)</span>
+          <h3>Mito: El Pájaro come almas</h3>
+          <p>Cuestionario competitivo de 10 preguntas de selección múltiple con ranking y podio grupal.</p>
+          <span class="tool-chip">Kahoot!</span>
+        </div>
+      </div>
+
+      <div class="quiz-box" style="border-color:var(--lit-border);">
+        <h4>🎯 Mini-reto interactivo (Nivel Literal)</h4>
+        <p class="q-stem">En el nivel literal, ¿cuál es la habilidad principal que desarrolla el estudiante como Agente de Letras?</p>
+        <div class="q-opts">
+          <button class="q-btn" onclick="checkMini(this, true, 'msg-lit', '¡Exacto! El nivel literal se enfoca en localizar información explícita directamente en el texto.')">A. Localizar datos, personajes y hechos explícitos</button>
+          <button class="q-btn" onclick="checkMini(this, false, 'msg-lit', 'Esa corresponde al nivel crítico. En el literal se recupera información explícita del texto.')">B. Debatir publicidad engañosa</button>
+          <button class="q-btn" onclick="checkMini(this, false, 'msg-lit', 'Esa corresponde al nivel inferencial. En el literal se identifican datos explícitos.')">C. Deducir pistas ocultas entre líneas</button>
+        </div>
+        <div class="q-msg" id="msg-lit"></div>
+      </div>
+    </section>
+
+    <!-- ==================== PANEL 3: MÓDULO 2 INFERENCIAL ==================== -->
+    <section class="panel" id="panel-inf">
+      <div class="level-banner banner-inf">
+        <h2 style="color:var(--inf-main);">Módulo 2: Nivel Inferencial — “El detective: la caza de pistas ocultas”</h2>
+        <p>Sesiones 4 a 6 (20 y 21 de octubre de 2026) • Propósito: deducir intenciones, causas y significados implícitos a partir de pistas.</p>
+      </div>
+
+      <div class="phase-legend">
+        <span class="pill p-concept">0. Conceptualización</span>
+        <span class="pill p-inicio">1. Fase de Inicio</span>
+        <span class="pill p-desarrollo">2. Fase de Desarrollo</span>
+        <span class="pill p-cierre">3. Fase de Cierre</span>
+      </div>
+
+      <div class="phases-grid">
+        <div class="phase-card concept">
+          <span class="phase-label">Fase 0 • Conceptualización</span>
+          <h3>Pistas y saberes previos</h3>
+          <p>Video explicativo, <em>flashcard</em> e infografía (Gemini IA) publicados en Google Classroom.</p>
+          <span class="tool-chip">Google Classroom + Gemini IA</span>
+        </div>
+        <div class="phase-card inicio">
+          <span class="phase-label">Fase 1 • Inicio (Prelectura)</span>
+          <h3>¡Responde rápido!</h3>
+          <p>Video-cuestionario interactivo de 6 preguntas (3 conceptuales y 3 de ejemplificación cotidiana).</p>
+          <span class="tool-chip">Edpuzzle</span>
+        </div>
+        <div class="phase-card desarrollo">
+          <span class="phase-label">Fase 2 • Desarrollo (Lectura)</span>
+          <h3>Detective Inferencial</h3>
+          <p><em>Escape Room</em> con 4 salas y 5 textos donde se debe inferir pistas ocultas para desbloquear el paso.</p>
+          <span class="tool-chip">Genially</span>
+        </div>
+        <div class="phase-card cierre">
+          <span class="phase-label">Fase 3 • Cierre (Poslectura)</span>
+          <h3>Misión en La Guajira</h3>
+          <p><em>El cactus y el corral</em>: 10 paradas sobre cultura Wayuu; al acertar crece el cactus y aparecen chivitos.</p>
+          <span class="tool-chip">Aplicativo Web en GitHub</span>
+        </div>
+      </div>
+
+      <div class="quiz-box" style="border-color:var(--inf-border);">
+        <h4>🎯 Mini-reto interactivo (Nivel Inferencial)</h4>
+        <p class="q-stem">“Tras meses de sequía en la ranchería, cayeron las primeras gotas y los niños corrieron alegres hacia el corral.” ¿Qué se infiere?</p>
+        <div class="q-opts">
+          <button class="q-btn" onclick="checkMini(this, false, 'msg-inf', 'No necesariamente; el texto habla de alegría tras meses de sequía.')">A. Que los niños tenían miedo a la lluvia</button>
+          <button class="q-btn" onclick="checkMini(this, true, 'msg-inf', '¡Muy bien! Al conectar “meses de sequía” con su alegría, se deduce alivio y agua para sus animales.')">B. Que la lluvia anunciaba alivio y agua para el corral</button>
+        </div>
+        <div class="q-msg" id="msg-inf"></div>
+      </div>
+    </section>
+
+    <!-- ==================== PANEL 4: MÓDULO 3 CRÍTICO ==================== -->
+    <section class="panel" id="panel-cri">
+      <div class="level-banner banner-cri">
+        <h2 style="color:var(--cri-main);">Módulo 3: Nivel Crítico — “Leo, cuestiono y argumento”</h2>
+        <p>Sesiones 7 a 9 (26, 27 y 28 de octubre de 2026) • Propósito: identificar intenciones persuasivas, valorar textos y argumentar posturas.</p>
+      </div>
+
+      <div class="phase-legend">
+        <span class="pill p-concept">0. Conceptualización</span>
+        <span class="pill p-inicio">1. Fase de Inicio</span>
+        <span class="pill p-desarrollo">2. Fase de Desarrollo</span>
+        <span class="pill p-cierre">3. Fase de Cierre</span>
+      </div>
+
+      <div class="phases-grid">
+        <div class="phase-card concept">
+          <span class="phase-label">Fase 0 • Conceptualización</span>
+          <h3>Mirada crítica del lector</h3>
+          <p>Video y póster informativo sobre lectura crítica y diferenciación entre hechos y opiniones.</p>
+          <span class="tool-chip">Google Classroom + Canva</span>
+        </div>
+        <div class="phase-card inicio">
+          <span class="phase-label">Fase 1 • Inicio (Prelectura)</span>
+          <h3>Observemos los anuncios</h3>
+          <p><em>Muro crítico (¿Cuál es tu opinión?)</em> para debatir dos piezas publicitarias engañosas.</p>
+          <span class="tool-chip">Padlet</span>
+        </div>
+        <div class="phase-card desarrollo">
+          <span class="phase-label">Fase 2 • Desarrollo (Lectura)</span>
+          <h3>Aventureros Críticos</h3>
+          <p><em>Viajando a través de la lectura</em>: análisis de <em>Neuro-Flash</em>, <em>Brain-Max</em> y <em>El milagro en una botella</em>.</p>
+          <span class="tool-chip">Genially</span>
+        </div>
+        <div class="phase-card cierre">
+          <span class="phase-label">Fase 3 • Cierre (Poslectura)</span>
+          <h3>Tribunal de Barrancas</h3>
+          <p><em>Respondiendo críticamente</em>: cuestionario con 5 retos de selección múltiple y 1 caso abierto argumentado.</p>
+          <span class="tool-chip">Google Forms</span>
+        </div>
+      </div>
+
+      <div class="quiz-box" style="border-color:var(--cri-border);">
+        <h4>🎯 Mini-reto interactivo (Nivel Crítico)</h4>
+        <p class="q-stem">Un anuncio promete “aprobar todos los exámenes en 24 horas sin leer libros”. ¿Cuál es una postura crítica sustentada?</p>
+        <div class="q-opts">
+          <button class="q-btn" onclick="checkMini(this, true, 'msg-cri', '¡Correcto! Reconoces la persuasión engañosa y la cuestionas con argumentos.')">A. Cuestionarlo porque emplea publicidad engañosa sin sustento</button>
+          <button class="q-btn" onclick="checkMini(this, false, 'msg-cri', 'Aceptar sin cuestionar no corresponde a una postura crítica.')">B. Creerlo porque el anuncio tiene colores llamativos</button>
+        </div>
+        <div class="q-msg" id="msg-cri"></div>
+      </div>
+    </section>
+
+    <!-- ==================== PANEL 5: POST-TEST ==================== -->
+    <section class="panel" id="panel-post">
+      <div class="level-banner banner-post">
+        <h2 style="color:var(--post-main);">Etapa 5: Evaluación Final (Post-test) — “La Escalera del Saber”</h2>
+        <p>Aplicada el <strong>30 de octubre de 2026</strong> de forma individual en la sala de informática (2 turnos de 15 estudiantes) mediante aplicativo web en <strong>GitHub</strong> (20 preguntas: 15 cerradas y 5 abiertas sobre <em>El Hombre Caimán</em>, <em>La Madremonte</em>, <em>El origen del arcoíris</em>, <em>La Llorona</em> y un póster cultural).</p>
+      </div>
+
+      <div class="metrics-row">
+        <div class="m-box"><div class="big" style="color:var(--post-main);">54% → 77%</div><div class="sub">Promedio general (+23 pts)</div></div>
+        <div class="m-box"><div class="big" style="color:var(--lit-main);">69% → 83%</div><div class="sub">Nivel Literal (+14 pts)</div></div>
+        <div class="m-box"><div class="big" style="color:var(--inf-main);">43% → 81%</div><div class="sub">Nivel Inferencial (+38 pts)</div></div>
+        <div class="m-box"><div class="big" style="color:var(--cri-main);">23% → 67%</div><div class="sub">Nivel Crítico (+44 pts)</div></div>
+      </div>
+
+      <div class="bars-wrap">
+        <div class="bar-row">
+          <label><span style="color:var(--lit-main);">Literal: 69% → 83%</span><span>+14 pts</span></label>
+          <div class="track"><div class="fill" style="width:83%; background:var(--lit-main);"></div></div>
+        </div>
+        <div class="bar-row">
+          <label><span style="color:var(--inf-main);">Inferencial: 43% → 81%</span><span>+38 pts</span></label>
+          <div class="track"><div class="fill" style="width:81%; background:var(--inf-main);"></div></div>
+        </div>
+        <div class="bar-row">
+          <label><span style="color:var(--cri-main);">Crítico: 23% → 67% (90% cerradas / 57% abiertas)</span><span>+44 pts</span></label>
+          <div class="track"><div class="fill" style="width:67%; background:var(--cri-main);"></div></div>
+        </div>
+      </div>
+
+      <div class="quiz-box" style="border-color:var(--post-border); background:#fffbeb;">
+        <h4>📊 Impacto en la escala institucional (SIEE)</h4>
+        <p class="q-stem">
+          La calificación promedio subió de <strong>2,7 (Bajo)</strong> a <strong>3,8 (Básico)</strong>. El desempeño <strong>Bajo</strong> se redujo del
+          <strong>53% al 17%</strong>, mientras que los niveles <strong>Alto (33%) y Superior (20%)</strong> sumados ascendieron del <strong>17% al 53%</strong>.
+        </p>
+        <a class="btn-lms" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
+          ↗ Ingresar al LMS Google Classroom (Código: umxduefs)
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span>Autores: Mery Xiomara Angulo Balanta, Yuliana Bello Velásquez y Adrián Andrés López Pérez</span>
+      <span>Maestría en Recursos Digitales Aplicados a la Educación • Universidad de Cartagena</span>
+    </footer>
+  </div>
+
+  <script>
+    function showPanel(key, btnEl) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + key).classList.add('active');
+      btnEl.classList.add('active');
+    }
+
+    function checkMini(btnEl, isCorrect, msgId, text) {
+      const group = btnEl.parentElement.querySelectorAll('.q-btn');
+      group.forEach(b => { b.classList.remove('ok', 'err'); });
+      btnEl.classList.add(isCorrect ? 'ok' : 'err');
+      const msg = document.getElementById(msgId);
+      msg.style.display = 'block';
+      msg.style.color = isCorrect ? '#15803d' : '#b91c1c';
+      msg.textContent = (isCorrect ? '✅ ' : '❌ ') + text;
+    }
+  </script>
+</body>
+</html>
