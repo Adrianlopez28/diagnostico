@@ -3,53 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RED Completo: Leer, Inferir y Argumentar — Ruta Gamificada</title>
+  <title>El Desafío de un Lector Competente — Ruta Gamificada</title>
   <style>
     :root {
-      /* Colores distintos por nivel/etapa */
+      /* Colores distintos por nivel */
       --diag-main: #334155;
-      --diag-light: #f1f5f9;
+      --diag-soft: #f1f5f9;
       --diag-border: #94a3b8;
 
       --lit-main: #1d4ed8;
-      --lit-light: #eff6ff;
+      --lit-soft: #eff6ff;
       --lit-border: #93c5fd;
 
       --inf-main: #0f766e;
-      --inf-light: #f0fdfa;
+      --inf-soft: #f0fdfa;
       --inf-border: #5eead4;
 
       --cri-main: #6d28d9;
-      --cri-light: #f5f3ff;
+      --cri-soft: #f5f3ff;
       --cri-border: #c4b5fd;
 
       --post-main: #b45309;
-      --post-light: #fffbeb;
+      --post-soft: #fffbeb;
       --post-border: #fcd34d;
 
-      /* Colores distintos por fase interna (Conceptualización, Inicio, Desarrollo, Cierre) */
+      /* Colores distintos por fase interna */
       --f-concept: #475569;
       --f-inicio: #0284c7;
       --f-desarrollo: #d97706;
       --f-cierre: #15803d;
 
-      --bg: #f8fafc;
-      --white: #ffffff;
+      --ok: #16a34a;
+      --err: #dc2626;
       --text: #1e293b;
       --muted: #475569;
+      --bg: #e2e8f0;
+      --white: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #e2e8f0;
+      background: var(--bg);
       color: var(--text);
       line-height: 1.5;
-      padding: 14px;
+      padding: 12px;
     }
 
-    .red-shell {
-      max-width: 980px;
+    .shell {
+      max-width: 960px;
       margin: 0 auto;
       background: var(--white);
       border-radius: 18px;
@@ -59,49 +61,57 @@
     }
 
     /* ENCABEZADO */
-    .top-header {
+    header {
       background: linear-gradient(125deg, #0f2547 0%, #1e3a8a 100%);
       color: #fff;
-      padding: 18px 24px;
+      padding: 16px 22px;
+      border-bottom: 4px solid #f59e0b;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      border-bottom: 4px solid #f59e0b;
     }
-    .top-header .kicker {
-      font-size: 0.74rem;
+    .kicker {
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.7px;
       color: #fde68a;
       font-weight: 700;
     }
-    .top-header h1 {
-      font-size: 1.25rem;
-      margin: 3px 0;
-    }
-    .top-header p {
-      font-size: 0.84rem;
-      color: #cbd5e1;
-    }
-    .btn-lms {
-      display: inline-flex;
+    header h1 { font-size: 1.2rem; margin: 2px 0; }
+    header p { font-size: 0.82rem; color: #cbd5e1; }
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       align-items: center;
-      gap: 6px;
+    }
+    .btn-top {
       background: #f59e0b;
       color: #0f172a;
       font-weight: 800;
-      font-size: 0.84rem;
-      padding: 9px 14px;
-      border-radius: 10px;
+      font-size: 0.8rem;
+      padding: 8px 13px;
+      border-radius: 9px;
       text-decoration: none;
-      white-space: nowrap;
-      transition: transform 0.15s, background 0.2s;
+      border: none;
+      cursor: pointer;
     }
-    .btn-lms:hover { background: #d97706; color: #fff; transform: translateY(-1px); }
+    .btn-top:hover { background: #d97706; color: #fff; }
+    .btn-unlock {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.35);
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 7px 11px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+    .btn-unlock:hover { background: rgba(255,255,255,0.25); }
 
-    /* BARRA DE NAVEGACIÓN POR NIVELES (5 COLORES DISTINTOS) */
+    /* BARRA DE NIVELES */
     .level-nav {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -116,199 +126,290 @@
     .lvl-btn {
       border: 2px solid transparent;
       border-radius: 12px;
-      padding: 10px 8px;
+      padding: 9px 6px;
       cursor: pointer;
       background: #fff;
       text-align: center;
       font-weight: 700;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       transition: all 0.2s;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
     }
-    .lvl-btn small { font-weight: 600; font-size: 0.7rem; opacity: 0.85; }
+    .lvl-btn small { font-size: 0.68rem; font-weight: 600; opacity: 0.85; }
+    .lvl-btn.locked {
+      opacity: 0.48;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
 
-    /* Colores individuales de botones */
     .lvl-btn.c-diag { color: var(--diag-main); border-color: var(--diag-border); }
-    .lvl-btn.c-diag.active, .lvl-btn.c-diag:hover { background: var(--diag-main); color: #fff; }
+    .lvl-btn.c-diag.active { background: var(--diag-main); color: #fff; }
 
     .lvl-btn.c-lit { color: var(--lit-main); border-color: var(--lit-border); }
-    .lvl-btn.c-lit.active, .lvl-btn.c-lit:hover { background: var(--lit-main); color: #fff; }
+    .lvl-btn.c-lit.active { background: var(--lit-main); color: #fff; }
 
     .lvl-btn.c-inf { color: var(--inf-main); border-color: var(--inf-border); }
-    .lvl-btn.c-inf.active, .lvl-btn.c-inf:hover { background: var(--inf-main); color: #fff; }
+    .lvl-btn.c-inf.active { background: var(--inf-main); color: #fff; }
 
     .lvl-btn.c-cri { color: var(--cri-main); border-color: var(--cri-border); }
-    .lvl-btn.c-cri.active, .lvl-btn.c-cri:hover { background: var(--cri-main); color: #fff; }
+    .lvl-btn.c-cri.active { background: var(--cri-main); color: #fff; }
 
     .lvl-btn.c-post { color: var(--post-main); border-color: var(--post-border); }
-    .lvl-btn.c-post.active, .lvl-btn.c-post:hover { background: var(--post-main); color: #fff; }
+    .lvl-btn.c-post.active { background: var(--post-main); color: #fff; }
 
-    /* PANELES DE CONTENIDO */
-    .panel { display: none; padding: 22px; animation: fadeIn 0.25s ease; }
+    /* PANELES */
+    main { padding: 20px 22px; }
+    .panel { display: none; animation: fadeIn 0.25s ease; }
     .panel.active { display: block; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* BANNER DE CADA NIVEL */
-    .level-banner {
+    .banner {
       border-radius: 14px;
-      padding: 16px 20px;
-      margin-bottom: 18px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
       border-left: 6px solid;
     }
-    .banner-diag { background: var(--diag-light); border-color: var(--diag-main); }
-    .banner-lit  { background: var(--lit-light);  border-color: var(--lit-main); }
-    .banner-inf  { background: var(--inf-light);  border-color: var(--inf-main); }
-    .banner-cri  { background: var(--cri-light);  border-color: var(--cri-main); }
-    .banner-post { background: var(--post-light); border-color: var(--post-main); }
+    .b-diag { background: var(--diag-soft); border-color: var(--diag-main); }
+    .b-lit  { background: var(--lit-soft);  border-color: var(--lit-main); }
+    .b-inf  { background: var(--inf-soft);  border-color: var(--inf-main); }
+    .b-cri  { background: var(--cri-soft);  border-color: var(--cri-main); }
+    .b-post { background: var(--post-soft); border-color: var(--post-main); }
+    .banner h2 { font-size: 1.15rem; margin-bottom: 3px; }
+    .banner p { font-size: 0.88rem; color: var(--muted); }
 
-    .level-banner h2 { font-size: 1.2rem; margin-bottom: 4px; }
-    .level-banner p  { font-size: 0.9rem; color: var(--muted); }
-
-    /* DIFERENCIACIÓN DE FASES INTERNAS */
-    .phase-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-      font-size: 0.76rem;
-      font-weight: 700;
-    }
-    .pill {
-      padding: 4px 10px;
-      border-radius: 999px;
-      color: #fff;
-      display: inline-block;
-    }
-    .p-concept { background: var(--f-concept); }
-    .p-inicio { background: var(--f-inicio); }
-    .p-desarrollo { background: var(--f-desarrollo); }
-    .p-cierre { background: var(--f-cierre); }
-
-    .phases-grid {
+    /* SUBNAVEGACIÓN DE FASES DENTRO DE CADA MÓDULO */
+    .phase-stepper {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
     }
-    .phase-card {
+    @media (max-width: 680px) {
+      .phase-stepper { grid-template-columns: repeat(2, 1fr); }
+    }
+    .phase-tab {
+      border: 2px solid #cbd5e1;
+      border-top-width: 5px;
+      border-radius: 10px;
+      padding: 8px 10px;
       background: #fff;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      border-top: 5px solid;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
     }
-    .phase-card.concept { border-top-color: var(--f-concept); background: #f8fafc; }
-    .phase-card.inicio { border-top-color: var(--f-inicio); }
-    .phase-card.desarrollo { border-top-color: var(--f-desarrollo); }
-    .phase-card.cierre { border-top-color: var(--f-cierre); }
+    .phase-tab.locked { opacity: 0.45; cursor: not-allowed; }
+    .phase-tab .pt-lbl {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .phase-tab .pt-name {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .pt-concept { border-top-color: var(--f-concept); }
+    .pt-concept .pt-lbl { color: var(--f-concept); }
+    .pt-concept.active { background: #f1f5f9; border-color: var(--f-concept); }
 
-    .phase-card .phase-label {
+    .pt-inicio { border-top-color: var(--f-inicio); }
+    .pt-inicio .pt-lbl { color: var(--f-inicio); }
+    .pt-inicio.active { background: #e0f2fe; border-color: var(--f-inicio); }
+
+    .pt-desarrollo { border-top-color: var(--f-desarrollo); }
+    .pt-desarrollo .pt-lbl { color: var(--f-desarrollo); }
+    .pt-desarrollo.active { background: #fef3c7; border-color: var(--f-desarrollo); }
+
+    .pt-cierre { border-top-color: var(--f-cierre); }
+    .pt-cierre .pt-lbl { color: var(--f-cierre); }
+    .pt-cierre.active { background: #dcfce7; border-color: var(--f-cierre); }
+
+    /* TARJETAS DE LECTURA Y PREGUNTAS */
+    .stage-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 18px;
+      background: #fff;
+    }
+    .phase-badge {
+      display: inline-block;
       font-size: 0.72rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
     }
-    .phase-card.concept .phase-label { color: var(--f-concept); }
-    .phase-card.inicio .phase-label { color: var(--f-inicio); }
-    .phase-card.desarrollo .phase-label { color: var(--f-desarrollo); }
-    .phase-card.cierre .phase-label { color: var(--f-cierre); }
+    .bg-concept { background: var(--f-concept); }
+    .bg-inicio { background: var(--f-inicio); }
+    .bg-desarrollo { background: var(--f-desarrollo); }
+    .bg-cierre { background: var(--f-cierre); }
 
-    .phase-card h3 { font-size: 0.96rem; color: #0f172a; }
-    .phase-card p  { font-size: 0.83rem; color: var(--muted); }
-    .tool-chip {
-      margin-top: auto;
-      display: inline-block;
-      align-self: flex-start;
-      font-size: 0.74rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: #e2e8f0;
-      color: #0f172a;
+    .reading-card {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 5px solid #f59e0b;
+      border-radius: 10px;
+      padding: 12px 15px;
+      margin-bottom: 14px;
     }
-
-    /* MÉTRICAS Y BARRAS */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-    .m-box {
-      background: #fff;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 14px;
-      text-align: center;
-    }
-    .m-box .big { font-size: 1.55rem; font-weight: 800; }
-    .m-box .sub { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
-
-    .bars-wrap { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
-    .bar-row label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.86rem;
-      font-weight: 700;
+    .reading-card .r-title {
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #b45309;
       margin-bottom: 4px;
     }
-    .track {
-      height: 14px;
-      background: #e2e8f0;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.5s ease;
-    }
+    .reading-card p { font-size: 0.91rem; color: #1e293b; }
 
-    /* MINI RETO INTERACTIVO POR MÓDULO */
-    .quiz-box {
+    .q-item {
       background: #f8fafc;
-      border: 2px dashed #94a3b8;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 16px;
-      margin-top: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
-    .quiz-box h4 { font-size: 0.94rem; margin-bottom: 6px; color: #0f172a; }
-    .quiz-box .q-stem { font-size: 0.88rem; margin-bottom: 10px; color: var(--text); }
-    .q-opts { display: flex; flex-wrap: wrap; gap: 8px; }
-    .q-btn {
+    .q-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .q-lvl-pill {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .pill-lit { background: #dbeafe; color: #1e40af; }
+    .pill-inf { background: #ccfbf1; color: #0f766e; }
+    .pill-cri { background: #ede9fe; color: #5b21b6; }
+
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt-btn {
+      text-align: left;
       background: #fff;
-      border: 1px solid #94a3b8;
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 0.83rem;
-      font-weight: 600;
+      border: 2px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: 0.88rem;
       cursor: pointer;
+      color: var(--text);
+      font-weight: 500;
       transition: all 0.15s;
     }
-    .q-btn:hover { background: #e2e8f0; }
-    .q-btn.ok { background: #dcfce7; border-color: #16a34a; color: #14532d; }
-    .q-btn.err { background: #fee2e2; border-color: #dc2626; color: #7f1d1d; }
-    .q-msg {
-      margin-top: 10px;
+    .opt-btn:hover:not(:disabled) { border-color: #1d4ed8; background: #eff6ff; }
+    .opt-btn.correct { border-color: var(--ok); background: #dcfce7; color: #14532d; font-weight: 700; }
+    .opt-btn.wrong { border-color: var(--err); background: #fee2e2; color: #7f1d1d; }
+
+    .fb {
+      margin-top: 8px;
+      padding: 9px 12px;
+      border-radius: 8px;
       font-size: 0.84rem;
-      font-weight: 600;
       display: none;
+      font-weight: 600;
+    }
+    .fb.show { display: block; }
+    .fb.ok { background: #dcfce7; color: #14532d; border-left: 4px solid var(--ok); }
+    .fb.err { background: #fee2e2; color: #7f1d1d; border-left: 4px solid var(--err); }
+
+    .btn-action {
+      background: #0f2547;
+      color: #fff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .btn-action:hover { background: #1d4ed8; }
+    .btn-next-lvl { background: #15803d; }
+    .btn-next-lvl:hover { background: #166534; }
+
+    /* GAMIFICACIÓN VISUAL: CACTUS Y ESCALERA */
+    .gamif-strip {
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #0f766e;
+    }
+    .ladder-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .step-cell {
+      background: #fef3c7;
+      border: 2px solid #fcd34d;
+      border-radius: 8px;
+      padding: 7px 4px;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #92400e;
+    }
+    .step-cell.done {
+      background: #16a34a;
+      border-color: #15803d;
+      color: #fff;
     }
 
-    /* PIE DE PÁGINA */
+    /* REPORTES */
+    .report-box {
+      background: #f8fafc;
+      border: 2px solid #0f2547;
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 14px;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .m-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .m-card .val { font-size: 1.4rem; font-weight: 800; }
+    .m-card .lbl { font-size: 0.76rem; color: var(--muted); font-weight: 600; }
+
     footer {
       background: #0f2547;
       color: #cbd5e1;
-      padding: 12px 22px;
+      padding: 11px 22px;
       font-size: 0.76rem;
       display: flex;
       justify-content: space-between;
@@ -318,302 +419,807 @@
   </style>
 </head>
 <body>
-  <div class="red-shell">
-    <header class="top-header">
+  <div class="shell">
+    <header>
       <div>
-        <div class="kicker">RED Interactivo Completo • I.E.T. Remedios Solano (Barrancas, La Guajira) • Grado 601</div>
-        <h1>“Leer, inferir y argumentar: ruta gamificada para fortalecer la comprensión lectora”</h1>
-        <p>Rol: <strong>Agente de Letras</strong> • LMS Google Classroom (<em>El desafío de un lector competente</em>) • Código: <strong>umxduefs</strong></p>
+        <div class="kicker">Recurso Educativo Digital • Comprensión Lectora • Grado Sexto</div>
+        <h1>🧭 El Desafío de un Lector Competente</h1>
+        <p>Ruta gamificada progresiva: Diagnóstico → Literal → Inferencial → Crítico → Post-test</p>
       </div>
-      <a class="btn-lms" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
-        🎓 Abrir Google Classroom
-      </a>
+      <div class="header-actions">
+        <button class="btn-unlock" id="unlockBtn" onclick="toggleExploreMode()">🔓 Modo Exploración</button>
+        <a class="btn-top" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
+          🎓 Ir a Google Classroom
+        </a>
+      </div>
     </header>
 
-    <!-- NAVEGACIÓN: CADA NIVEL / ETAPA CON UN COLOR DIFERENTE -->
-    <nav class="level-nav" role="tablist">
-      <button class="lvl-btn c-diag active" onclick="showPanel('diag', this)">
+    <!-- NAVEGACIÓN PRINCIPAL: UN COLOR POR NIVEL -->
+    <nav class="level-nav">
+      <button class="lvl-btn c-diag active" id="nav-0" onclick="goLevel(0)">
         <span>📋 1. Diagnóstico</span>
-        <small>Línea base (54%)</small>
+        <small id="st-0">En curso</small>
       </button>
-      <button class="lvl-btn c-lit" onclick="showPanel('lit', this)">
-        <span>📘 2. Módulo 1</span>
-        <small>Nivel Literal</small>
+      <button class="lvl-btn c-lit locked" id="nav-1" onclick="goLevel(1)">
+        <span>📘 2. Nivel Literal</span>
+        <small id="st-1">🔒 Bloqueado</small>
       </button>
-      <button class="lvl-btn c-inf" onclick="showPanel('inf', this)">
-        <span>🔍 3. Módulo 2</span>
-        <small>Nivel Inferencial</small>
+      <button class="lvl-btn c-inf locked" id="nav-2" onclick="goLevel(2)">
+        <span>🔍 3. Nivel Inferencial</span>
+        <small id="st-2">🔒 Bloqueado</small>
       </button>
-      <button class="lvl-btn c-cri" onclick="showPanel('cri', this)">
-        <span>⚖️ 4. Módulo 3</span>
-        <small>Nivel Crítico</small>
+      <button class="lvl-btn c-cri locked" id="nav-3" onclick="goLevel(3)">
+        <span>⚖️ 4. Nivel Crítico</span>
+        <small id="st-3">🔒 Bloqueado</small>
       </button>
-      <button class="lvl-btn c-post" onclick="showPanel('post', this)">
+      <button class="lvl-btn c-post locked" id="nav-4" onclick="goLevel(4)">
         <span>🏆 5. Post-test</span>
-        <small>La Escalera (77%)</small>
+        <small id="st-4">🔒 Bloqueado</small>
       </button>
     </nav>
 
-    <!-- ==================== PANEL 1: DIAGNÓSTICO ==================== -->
-    <section class="panel active" id="panel-diag">
-      <div class="level-banner banner-diag">
-        <h2 style="color:var(--diag-main);">Etapa 1: Fase Diagnóstica (13 de octubre de 2026)</h2>
-        <p>Aplicación impresa a <strong>30 estudiantes</strong> (de la muestra de 33 del grado 601) para caracterizar el estado inicial en los tres niveles de lectura.</p>
-      </div>
+    <main>
+      <!-- ==================== NIVEL 0: DIAGNÓSTICO ==================== -->
+      <section class="panel active" id="panel-0">
+        <div class="banner b-diag">
+          <h2 style="color:var(--diag-main);">Etapa 1: Prueba Diagnóstica — “Agente de Letras”</h2>
+          <p>Responde las 6 preguntas diagnósticas (niveles literal, inferencial y crítico) para identificar tu punto de partida y desbloquear el Módulo 1.</p>
+        </div>
+        <div id="diag-container"></div>
+        <div id="diag-report" style="display:none;"></div>
+      </section>
 
-      <div class="metrics-row">
-        <div class="m-box"><div class="big" style="color:var(--diag-main);">54%</div><div class="sub">Promedio general (Nota SIEE: 2,7 Bajo)</div></div>
-        <div class="m-box"><div class="big" style="color:var(--lit-main);">69%</div><div class="sub">Nivel Literal (103/150)</div></div>
-        <div class="m-box"><div class="big" style="color:var(--inf-main);">43%</div><div class="sub">Nivel Inferencial (51/120)</div></div>
-        <div class="m-box"><div class="big" style="color:var(--cri-main);">23%</div><div class="sub">Nivel Crítico (7/30)</div></div>
-      </div>
+      <!-- ==================== NIVEL 1: MÓDULO LITERAL ==================== -->
+      <section class="panel" id="panel-1">
+        <div class="banner b-lit">
+          <h2 style="color:var(--lit-main);">Módulo 1: Nivel Literal — “Exploradores de información explícita”</h2>
+          <p>Avanza por cada fase (Conceptualización, Inicio, Desarrollo y Cierre) para dominar la localización de datos explícitos y desbloquear el Nivel Inferencial.</p>
+        </div>
+        <div class="phase-stepper" id="stepper-1"></div>
+        <div class="stage-box" id="stage-1"></div>
+      </section>
 
-      <div class="bars-wrap">
-        <div class="bar-row">
-          <label><span style="color:var(--lit-main);">Nivel Literal</span><span>69%</span></label>
-          <div class="track"><div class="fill" style="width:69%; background:var(--lit-main);"></div></div>
+      <!-- ==================== NIVEL 2: MÓDULO INFERENCIAL ==================== -->
+      <section class="panel" id="panel-2">
+        <div class="banner b-inf">
+          <h2 style="color:var(--inf-main);">Módulo 2: Nivel Inferencial — “El detective: la caza de pistas ocultas”</h2>
+          <p>Completa las 4 fases diferenciadas para fortalecer la deducción de información implícita y desbloquear el Nivel Crítico.</p>
         </div>
-        <div class="bar-row">
-          <label><span style="color:var(--inf-main);">Nivel Inferencial</span><span>43%</span></label>
-          <div class="track"><div class="fill" style="width:43%; background:var(--inf-main);"></div></div>
-        </div>
-        <div class="bar-row">
-          <label><span style="color:var(--cri-main);">Nivel Crítico</span><span>23%</span></label>
-          <div class="track"><div class="fill" style="width:23%; background:var(--cri-main);"></div></div>
-        </div>
-      </div>
+        <div class="phase-stepper" id="stepper-2"></div>
+        <div class="stage-box" id="stage-2"></div>
+      </section>
 
-      <div class="quiz-box">
-        <h4>🔎 Hallazgo clave del diagnóstico</h4>
-        <p class="q-stem">
-          Se identificó una brecha de <strong>46 puntos porcentuales</strong> entre el nivel literal (69%) y el nivel crítico (23%).
-          En la escala institucional (SIEE), el <strong>83%</strong> del grupo se ubicó en desempeño <strong>Bajo (53%)</strong> y <strong>Básico (30%)</strong>,
-          con 17% en Alto y 0% en Superior.
-        </p>
-      </div>
-    </section>
+      <!-- ==================== NIVEL 3: MÓDULO CRÍTICO ==================== -->
+      <section class="panel" id="panel-3">
+        <div class="banner b-cri">
+          <h2 style="color:var(--cri-main);">Módulo 3: Nivel Crítico — “Leo, cuestiono y argumento”</h2>
+          <p>Supera las 4 fases de análisis publicitario y argumentación para desbloquear la evaluación final: <em>La Escalera del Saber</em>.</p>
+        </div>
+        <div class="phase-stepper" id="stepper-3"></div>
+        <div class="stage-box" id="stage-3"></div>
+      </section>
 
-    <!-- ==================== PANEL 2: MÓDULO 1 LITERAL ==================== -->
-    <section class="panel" id="panel-lit">
-      <div class="level-banner banner-lit">
-        <h2 style="color:var(--lit-main);">Módulo 1: Nivel Literal — “Exploradores de información explícita”</h2>
-        <p>Sesiones 1 a 3 (14, 15 y 16 de octubre de 2026) • Propósito: localizar datos explícitos, personajes, lugares y hechos precisos.</p>
-      </div>
-
-      <div class="phase-legend">
-        <span class="pill p-concept">0. Conceptualización</span>
-        <span class="pill p-inicio">1. Fase de Inicio</span>
-        <span class="pill p-desarrollo">2. Fase de Desarrollo</span>
-        <span class="pill p-cierre">3. Fase de Cierre</span>
-      </div>
-
-      <div class="phases-grid">
-        <div class="phase-card concept">
-          <span class="phase-label">Fase 0 • Conceptualización</span>
-          <h3>Activación de saberes</h3>
-          <p>Video explicativo del profe Hermes e infografías diseñadas con Gemini IA dentro del aula virtual.</p>
-          <span class="tool-chip">Google Classroom + YouTube</span>
+      <!-- ==================== NIVEL 4: POST-TEST ==================== -->
+      <section class="panel" id="panel-4">
+        <div class="banner b-post">
+          <h2 style="color:var(--post-main);">Etapa 5: Prueba Final (Post-test) — “La Escalera del Saber”</h2>
+          <p>Sube los 5 peldaños respondiendo preguntas sobre mitos y leyendas de la tradición oral, la cosmovisión Wayuu y un texto discontinuo tipo póster.</p>
         </div>
-        <div class="phase-card inicio">
-          <span class="phase-label">Fase 1 • Inicio (Prelectura)</span>
-          <h3>Froggy Jumps</h3>
-          <p>Juego interactivo de 5 preguntas conceptuales para reconocer las claves de la lectura literal.</p>
-          <span class="tool-chip">Educaplay</span>
-        </div>
-        <div class="phase-card desarrollo">
-          <span class="phase-label">Fase 2 • Desarrollo (Lectura)</span>
-          <h3>Escape Room: Código Secreto</h3>
-          <p><em>Operación ojo de águila</em> sobre el cuento <em>“Es la pura verdad”</em> de Hans Christian Andersen.</p>
-          <span class="tool-chip">Genially</span>
-        </div>
-        <div class="phase-card cierre">
-          <span class="phase-label">Fase 3 • Cierre (Poslectura)</span>
-          <h3>Mito: El Pájaro come almas</h3>
-          <p>Cuestionario competitivo de 10 preguntas de selección múltiple con ranking y podio grupal.</p>
-          <span class="tool-chip">Kahoot!</span>
-        </div>
-      </div>
-
-      <div class="quiz-box" style="border-color:var(--lit-border);">
-        <h4>🎯 Mini-reto interactivo (Nivel Literal)</h4>
-        <p class="q-stem">En el nivel literal, ¿cuál es la habilidad principal que desarrolla el estudiante como Agente de Letras?</p>
-        <div class="q-opts">
-          <button class="q-btn" onclick="checkMini(this, true, 'msg-lit', '¡Exacto! El nivel literal se enfoca en localizar información explícita directamente en el texto.')">A. Localizar datos, personajes y hechos explícitos</button>
-          <button class="q-btn" onclick="checkMini(this, false, 'msg-lit', 'Esa corresponde al nivel crítico. En el literal se recupera información explícita del texto.')">B. Debatir publicidad engañosa</button>
-          <button class="q-btn" onclick="checkMini(this, false, 'msg-lit', 'Esa corresponde al nivel inferencial. En el literal se identifican datos explícitos.')">C. Deducir pistas ocultas entre líneas</button>
-        </div>
-        <div class="q-msg" id="msg-lit"></div>
-      </div>
-    </section>
-
-    <!-- ==================== PANEL 3: MÓDULO 2 INFERENCIAL ==================== -->
-    <section class="panel" id="panel-inf">
-      <div class="level-banner banner-inf">
-        <h2 style="color:var(--inf-main);">Módulo 2: Nivel Inferencial — “El detective: la caza de pistas ocultas”</h2>
-        <p>Sesiones 4 a 6 (20 y 21 de octubre de 2026) • Propósito: deducir intenciones, causas y significados implícitos a partir de pistas.</p>
-      </div>
-
-      <div class="phase-legend">
-        <span class="pill p-concept">0. Conceptualización</span>
-        <span class="pill p-inicio">1. Fase de Inicio</span>
-        <span class="pill p-desarrollo">2. Fase de Desarrollo</span>
-        <span class="pill p-cierre">3. Fase de Cierre</span>
-      </div>
-
-      <div class="phases-grid">
-        <div class="phase-card concept">
-          <span class="phase-label">Fase 0 • Conceptualización</span>
-          <h3>Pistas y saberes previos</h3>
-          <p>Video explicativo, <em>flashcard</em> e infografía (Gemini IA) publicados en Google Classroom.</p>
-          <span class="tool-chip">Google Classroom + Gemini IA</span>
-        </div>
-        <div class="phase-card inicio">
-          <span class="phase-label">Fase 1 • Inicio (Prelectura)</span>
-          <h3>¡Responde rápido!</h3>
-          <p>Video-cuestionario interactivo de 6 preguntas (3 conceptuales y 3 de ejemplificación cotidiana).</p>
-          <span class="tool-chip">Edpuzzle</span>
-        </div>
-        <div class="phase-card desarrollo">
-          <span class="phase-label">Fase 2 • Desarrollo (Lectura)</span>
-          <h3>Detective Inferencial</h3>
-          <p><em>Escape Room</em> con 4 salas y 5 textos donde se debe inferir pistas ocultas para desbloquear el paso.</p>
-          <span class="tool-chip">Genially</span>
-        </div>
-        <div class="phase-card cierre">
-          <span class="phase-label">Fase 3 • Cierre (Poslectura)</span>
-          <h3>Misión en La Guajira</h3>
-          <p><em>El cactus y el corral</em>: 10 paradas sobre cultura Wayuu; al acertar crece el cactus y aparecen chivitos.</p>
-          <span class="tool-chip">Aplicativo Web en GitHub</span>
-        </div>
-      </div>
-
-      <div class="quiz-box" style="border-color:var(--inf-border);">
-        <h4>🎯 Mini-reto interactivo (Nivel Inferencial)</h4>
-        <p class="q-stem">“Tras meses de sequía en la ranchería, cayeron las primeras gotas y los niños corrieron alegres hacia el corral.” ¿Qué se infiere?</p>
-        <div class="q-opts">
-          <button class="q-btn" onclick="checkMini(this, false, 'msg-inf', 'No necesariamente; el texto habla de alegría tras meses de sequía.')">A. Que los niños tenían miedo a la lluvia</button>
-          <button class="q-btn" onclick="checkMini(this, true, 'msg-inf', '¡Muy bien! Al conectar “meses de sequía” con su alegría, se deduce alivio y agua para sus animales.')">B. Que la lluvia anunciaba alivio y agua para el corral</button>
-        </div>
-        <div class="q-msg" id="msg-inf"></div>
-      </div>
-    </section>
-
-    <!-- ==================== PANEL 4: MÓDULO 3 CRÍTICO ==================== -->
-    <section class="panel" id="panel-cri">
-      <div class="level-banner banner-cri">
-        <h2 style="color:var(--cri-main);">Módulo 3: Nivel Crítico — “Leo, cuestiono y argumento”</h2>
-        <p>Sesiones 7 a 9 (26, 27 y 28 de octubre de 2026) • Propósito: identificar intenciones persuasivas, valorar textos y argumentar posturas.</p>
-      </div>
-
-      <div class="phase-legend">
-        <span class="pill p-concept">0. Conceptualización</span>
-        <span class="pill p-inicio">1. Fase de Inicio</span>
-        <span class="pill p-desarrollo">2. Fase de Desarrollo</span>
-        <span class="pill p-cierre">3. Fase de Cierre</span>
-      </div>
-
-      <div class="phases-grid">
-        <div class="phase-card concept">
-          <span class="phase-label">Fase 0 • Conceptualización</span>
-          <h3>Mirada crítica del lector</h3>
-          <p>Video y póster informativo sobre lectura crítica y diferenciación entre hechos y opiniones.</p>
-          <span class="tool-chip">Google Classroom + Canva</span>
-        </div>
-        <div class="phase-card inicio">
-          <span class="phase-label">Fase 1 • Inicio (Prelectura)</span>
-          <h3>Observemos los anuncios</h3>
-          <p><em>Muro crítico (¿Cuál es tu opinión?)</em> para debatir dos piezas publicitarias engañosas.</p>
-          <span class="tool-chip">Padlet</span>
-        </div>
-        <div class="phase-card desarrollo">
-          <span class="phase-label">Fase 2 • Desarrollo (Lectura)</span>
-          <h3>Aventureros Críticos</h3>
-          <p><em>Viajando a través de la lectura</em>: análisis de <em>Neuro-Flash</em>, <em>Brain-Max</em> y <em>El milagro en una botella</em>.</p>
-          <span class="tool-chip">Genially</span>
-        </div>
-        <div class="phase-card cierre">
-          <span class="phase-label">Fase 3 • Cierre (Poslectura)</span>
-          <h3>Tribunal de Barrancas</h3>
-          <p><em>Respondiendo críticamente</em>: cuestionario con 5 retos de selección múltiple y 1 caso abierto argumentado.</p>
-          <span class="tool-chip">Google Forms</span>
-        </div>
-      </div>
-
-      <div class="quiz-box" style="border-color:var(--cri-border);">
-        <h4>🎯 Mini-reto interactivo (Nivel Crítico)</h4>
-        <p class="q-stem">Un anuncio promete “aprobar todos los exámenes en 24 horas sin leer libros”. ¿Cuál es una postura crítica sustentada?</p>
-        <div class="q-opts">
-          <button class="q-btn" onclick="checkMini(this, true, 'msg-cri', '¡Correcto! Reconoces la persuasión engañosa y la cuestionas con argumentos.')">A. Cuestionarlo porque emplea publicidad engañosa sin sustento</button>
-          <button class="q-btn" onclick="checkMini(this, false, 'msg-cri', 'Aceptar sin cuestionar no corresponde a una postura crítica.')">B. Creerlo porque el anuncio tiene colores llamativos</button>
-        </div>
-        <div class="q-msg" id="msg-cri"></div>
-      </div>
-    </section>
-
-    <!-- ==================== PANEL 5: POST-TEST ==================== -->
-    <section class="panel" id="panel-post">
-      <div class="level-banner banner-post">
-        <h2 style="color:var(--post-main);">Etapa 5: Evaluación Final (Post-test) — “La Escalera del Saber”</h2>
-        <p>Aplicada el <strong>30 de octubre de 2026</strong> de forma individual en la sala de informática (2 turnos de 15 estudiantes) mediante aplicativo web en <strong>GitHub</strong> (20 preguntas: 15 cerradas y 5 abiertas sobre <em>El Hombre Caimán</em>, <em>La Madremonte</em>, <em>El origen del arcoíris</em>, <em>La Llorona</em> y un póster cultural).</p>
-      </div>
-
-      <div class="metrics-row">
-        <div class="m-box"><div class="big" style="color:var(--post-main);">54% → 77%</div><div class="sub">Promedio general (+23 pts)</div></div>
-        <div class="m-box"><div class="big" style="color:var(--lit-main);">69% → 83%</div><div class="sub">Nivel Literal (+14 pts)</div></div>
-        <div class="m-box"><div class="big" style="color:var(--inf-main);">43% → 81%</div><div class="sub">Nivel Inferencial (+38 pts)</div></div>
-        <div class="m-box"><div class="big" style="color:var(--cri-main);">23% → 67%</div><div class="sub">Nivel Crítico (+44 pts)</div></div>
-      </div>
-
-      <div class="bars-wrap">
-        <div class="bar-row">
-          <label><span style="color:var(--lit-main);">Literal: 69% → 83%</span><span>+14 pts</span></label>
-          <div class="track"><div class="fill" style="width:83%; background:var(--lit-main);"></div></div>
-        </div>
-        <div class="bar-row">
-          <label><span style="color:var(--inf-main);">Inferencial: 43% → 81%</span><span>+38 pts</span></label>
-          <div class="track"><div class="fill" style="width:81%; background:var(--inf-main);"></div></div>
-        </div>
-        <div class="bar-row">
-          <label><span style="color:var(--cri-main);">Crítico: 23% → 67% (90% cerradas / 57% abiertas)</span><span>+44 pts</span></label>
-          <div class="track"><div class="fill" style="width:67%; background:var(--cri-main);"></div></div>
-        </div>
-      </div>
-
-      <div class="quiz-box" style="border-color:var(--post-border); background:#fffbeb;">
-        <h4>📊 Impacto en la escala institucional (SIEE)</h4>
-        <p class="q-stem">
-          La calificación promedio subió de <strong>2,7 (Bajo)</strong> a <strong>3,8 (Básico)</strong>. El desempeño <strong>Bajo</strong> se redujo del
-          <strong>53% al 17%</strong>, mientras que los niveles <strong>Alto (33%) y Superior (20%)</strong> sumados ascendieron del <strong>17% al 53%</strong>.
-        </p>
-        <a class="btn-lms" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
-          ↗ Ingresar al LMS Google Classroom (Código: umxduefs)
-        </a>
-      </div>
-    </section>
+        <div class="ladder-steps" id="ladder-steps"></div>
+        <div id="post-container"></div>
+        <div id="post-report" style="display:none;"></div>
+      </section>
+    </main>
 
     <footer>
-      <span>Autores: Mery Xiomara Angulo Balanta, Yuliana Bello Velásquez y Adrián Andrés López Pérez</span>
-      <span>Maestría en Recursos Digitales Aplicados a la Educación • Universidad de Cartagena</span>
+      <span>Estrategia: “Leer, inferir y argumentar: ruta gamificada para fortalecer la comprensión lectora”</span>
+      <span>Código Google Classroom: <strong>umxduefs</strong></span>
     </footer>
   </div>
 
   <script>
-    function showPanel(key, btnEl) {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('panel-' + key).classList.add('active');
-      btnEl.classList.add('active');
+    /* ================= ESTADO GENERAL ================= */
+    let exploreMode = false;
+    let unlockedLevel = 0; // 0: Diag, 1: Lit, 2: Inf, 3: Cri, 4: Post
+
+    const diagData = [
+      {
+        level: "literal",
+        levelTag: "Nivel Literal",
+        pill: "pill-lit",
+        readingTitle: "Lectura 1: El Pájaro Come Almas",
+        reading: "En las noches oscuras de los montes cercanos a Barrancas, los abuelos relatan que un ave de plumaje negro y ojos brillantes vigila los caminos solitarios. Según la leyenda, el pájaro se acerca a quienes caminan distraídos sin escuchar los consejos de sus mayores.",
+        q: "1. Según el relato, ¿de qué color es el plumaje del ave?",
+        opts: ["Plumaje gris con manchas blancas.", "Plumaje negro.", "Plumaje dorado.", "Plumaje rojo."],
+        ans: 1,
+        fb: "El texto afirma explícitamente que es un ave de plumaje negro."
+      },
+      {
+        level: "literal",
+        levelTag: "Nivel Literal",
+        pill: "pill-lit",
+        readingTitle: "Lectura 2: Amanecer en la Ranchería",
+        reading: "Al amanecer, Walekerü revisó el corral antes de que el sol calentara la arena. Contó doce chivitos junto al cardón y llenó dos tinajas con agua fresca del jagüey.",
+        q: "2. ¿De dónde obtuvo Walekerü el agua fresca para las tinajas?",
+        opts: ["Del jagüey.", "De un pozo del pueblo.", "Del río.", "De la lluvia."],
+        ans: 0,
+        fb: "La respuesta aparece textualmente en la última oración: 'agua fresca del jagüey'."
+      },
+      {
+        level: "inferencial",
+        levelTag: "Nivel Inferencial",
+        pill: "pill-inf",
+        readingTitle: "Lectura 3: La Nota en el Pupitre",
+        reading: "Mateo encontró un papel doblado que decía: 'No olvides hoy el cuaderno azul; sin él no podremos exponer en la segunda hora'. Mateo miró el reloj y salió corriendo hacia su casa.",
+        q: "3. ¿Qué se puede deducir de la reacción de Mateo?",
+        opts: ["Que no quería asistir a clase.", "Que olvidó el cuaderno azul en su casa y aún tenía tiempo de buscarlo.", "Que el cuaderno estaba en el pupitre.", "Que la exposición se canceló."],
+        ans: 1,
+        fb: "Al leer el mensaje, mirar el reloj y correr a casa, se deduce que dejó el cuaderno allá."
+      },
+      {
+        level: "inferencial",
+        levelTag: "Nivel Inferencial",
+        pill: "pill-inf",
+        readingTitle: "Lectura 4: El Cardón del Desierto",
+        reading: "El guía señaló un cactus cardón lleno de frutos rojos y dijo: 'Cuando florece así, las aves nunca pasan hambre, pero solo quienes respetan el equilibrio del desierto saben aprovecharlo sin dañar la planta'.",
+        q: "4. ¿Cuál es la enseñanza implícita en las palabras del guía?",
+        opts: ["Que los frutos son venenosos.", "Que la naturaleza provee alimento si se cuida con respeto.", "Que las aves dañan el cactus.", "Que no se debe caminar por el desierto."],
+        ans: 1,
+        fb: "Se infiere un mensaje de cuidado ambiental y aprovechamiento responsable."
+      },
+      {
+        level: "critico",
+        levelTag: "Nivel Crítico",
+        pill: "pill-cri",
+        readingTitle: "Lectura 5: Anuncio 'Bebida Súper-Genio'",
+        reading: "Un cartel en redes sociales asegura: '¡Toma Súper-Genio cada mañana y aprobarás todos tus exámenes en 24 horas sin estudiar ni leer libros!'.",
+        q: "5. Desde una postura crítica, ¿cómo debes valorar este anuncio?",
+        opts: ["Aceptarlo porque es llamativo.", "Cuestionarlo porque usa publicidad engañosa al prometer resultados mágicos sin esfuerzo.", "Reemplazar la lectura por bebidas.", "Creerlo porque está en redes sociales."],
+        ans: 1,
+        fb: "Una lectura crítica identifica la persuasión engañosa y argumenta con criterio."
+      },
+      {
+        level: "critico",
+        levelTag: "Nivel Crítico",
+        pill: "pill-cri",
+        readingTitle: "Lectura 6: Noticia sin fuente",
+        reading: "Un mensaje reenviado en un grupo dice: 'Mañana no hay clases en ningún colegio del país, compártelo ya antes de que borren este aviso'. No incluye fecha ni entidad oficial.",
+        q: "6. ¿Cuál es la acción más crítica y responsable frente a ese mensaje?",
+        opts: ["Reenviarlo inmediatamente a todos.", "Verificar la información en fuentes oficiales antes de creerla o compartirla.", "Faltar a clases sin preguntar.", "Asumir que es verdad porque pide compartirlo rápido."],
+        ans: 1,
+        fb: "Verificar la fuente evita difundir desinformación y demuestra lectura crítica."
+      }
+    ];
+
+    const diagState = { answered: {}, score: { literal: 0, inferencial: 0, critico: 0 } };
+
+    /* ================= DATOS DE LOS 3 MÓDULOS (4 FASES DIFERENCIADAS CADA UNO) ================= */
+    const modulesData = {
+      1: {
+        unlockedPhase: 0,
+        currentPhase: 0,
+        answered: {},
+        phases: [
+          {
+            key: "concept",
+            badge: "Fase 0 • Conceptualización",
+            badgeClass: "bg-concept",
+            tabClass: "pt-concept",
+            name: "Saberes Previos",
+            title: "Conceptualización: ¿Qué es el Nivel Literal?",
+            readingTitle: "Cápsula conceptual (Google Classroom)",
+            reading: "En la lectura literal recuperamos la información explícita del texto: quiénes son los personajes, dónde y cuándo ocurren los hechos y qué acciones suceden exactamente, sin inventar ni suponer datos externos.",
+            questions: []
+          },
+          {
+            key: "inicio",
+            badge: "Fase 1 • Inicio (Prelectura)",
+            badgeClass: "bg-inicio",
+            tabClass: "pt-inicio",
+            name: "Froggy Jumps",
+            title: "Reto de Inicio: Froggy Jumps (Conceptos Literales)",
+            readingTitle: "Dinámica de activación",
+            reading: "Antes de leer un relato completo, un Agente de Letras reconoce qué preguntas buscan datos explícitos en el texto.",
+            questions: [
+              {
+                q: "¿Cuál de estas preguntas pertenece al nivel de lectura literal?",
+                opts: ["¿Qué opinas sobre la actitud del protagonista?", "¿En qué lugar y momento exacto ocurrió la historia?", "¿Qué crees que sucederá diez años después?"],
+                ans: 1,
+                fb: "Correcto. Preguntar por lugar y momento explícitos corresponde al nivel literal."
+              }
+            ]
+          },
+          {
+            key: "desarrollo",
+            badge: "Fase 2 • Desarrollo (Lectura)",
+            badgeClass: "bg-desarrollo",
+            tabClass: "pt-desarrollo",
+            name: "Escape Room",
+            title: "Reto de Desarrollo: Escape Room “Código Secreto – Operación Ojo de Águila”",
+            readingTitle: "Fragmento adaptado de 'Es la pura verdad' (H. C. Andersen)",
+            reading: "Una gallina blanca perdió una sola pluma al acicalarse en el gallinero. Al comentarlo con su vecina, la historia pasó de rama en rama hasta convertirse en el rumor de que cinco gallinas se habían desplumado por completo.",
+            questions: [
+              {
+                q: "Pista 1: ¿Cuántas plumas perdió realmente la gallina blanca al inicio?",
+                opts: ["Cinco plumas.", "Una sola pluma.", "Diez plumas."],
+                ans: 1,
+                fb: "¡Código desbloqueado! El texto indica literalmente que perdió una sola pluma."
+              },
+              {
+                q: "Pista 2: ¿En qué se transformó el rumor al final del fragmento?",
+                opts: ["En que cinco gallinas se habían desplumado por completo.", "En que el gallinero se cerró.", "En que la gallina voló lejos."],
+                ans: 0,
+                fb: "Exacto. Ese dato aparece de forma explícita al cierre del fragmento."
+              }
+            ]
+          },
+          {
+            key: "cierre",
+            badge: "Fase 3 • Cierre (Poslectura)",
+            badgeClass: "bg-cierre",
+            tabClass: "pt-cierre",
+            name: "El Pájaro Come Almas",
+            title: "Reto de Cierre: Mito “El Pájaro Come Almas”",
+            readingTitle: "Relato de la tradición oral",
+            reading: "Cuentan los mayores que el Pájaro Come Almas emite un silbido agudo cuando cae la medianoche y sobrevuela los techos de las casas donde nadie ha rezado ni escuchado las advertencias familiares.",
+            questions: [
+              {
+                q: "¿En qué momento exacto emite su silbido el ave según el fragmento?",
+                opts: ["Al mediodía.", "Cuando cae la medianoche.", "Al amanecer."],
+                ans: 1,
+                fb: "¡Módulo 1 completado! Identificaste el dato explícito con precisión."
+              }
+            ]
+          }
+        ]
+      },
+      2: {
+        unlockedPhase: 0,
+        currentPhase: 0,
+        answered: {},
+        cactusScore: 0,
+        phases: [
+          {
+            key: "concept",
+            badge: "Fase 0 • Conceptualización",
+            badgeClass: "bg-concept",
+            tabClass: "pt-concept",
+            name: "Pistas Ocultas",
+            title: "Conceptualización: ¿Qué es el Nivel Inferencial?",
+            readingTitle: "Cápsula conceptual (Google Classroom)",
+            reading: "Leer inferencialmente significa 'leer entre líneas': conectar las pistas del texto con nuestros saberes previos para deducir causas, emociones, intenciones o consecuencias que el autor no escribió de forma directa.",
+            questions: []
+          },
+          {
+            key: "inicio",
+            badge: "Fase 1 • Inicio (Prelectura)",
+            badgeClass: "bg-inicio",
+            tabClass: "pt-inicio",
+            name: "¡Responde Rápido!",
+            title: "Reto de Inicio: ¡Responde Rápido! (Inferencias Cotidianas)",
+            readingTitle: "Situación cotidiana",
+            reading: "Al llegar al salón, Laura cerró su paraguas empapado, sacudió sus zapatos llenos de barro y encendió el ventilador para secar su mochila.",
+            questions: [
+              {
+                q: "¿Qué se puede inferir sobre el clima afuera del colegio?",
+                opts: ["Hacía un sol intenso y seco.", "Estaba lloviendo fuerte.", "Había una tormenta de arena."],
+                ans: 1,
+                fb: "Muy bien. El paraguas empapado y el barro son pistas claras de lluvia fuerte."
+              }
+            ]
+          },
+          {
+            key: "desarrollo",
+            badge: "Fase 2 • Desarrollo (Lectura)",
+            badgeClass: "bg-desarrollo",
+            tabClass: "pt-desarrollo",
+            name: "Detective Inferencial",
+            title: "Reto de Desarrollo: Escape Room “Detective Inferencial”",
+            readingTitle: "Sala del Detective",
+            reading: "Cuando anunciaron el ganador del concurso de cuentos, Tomás bajó la mirada, guardó lentamente sus hojas en la maleta y salió sin felicitar a nadie, aunque luego volvió para darle la mano a su compañera.",
+            questions: [
+              {
+                q: "¿Qué emoción sintió Tomás inicialmente y qué valor demostró al regresar?",
+                opts: ["Alegría inicial y luego enojo.", "Decepción al no ganar, pero respeto y deportividad al volver a felicitar.", "Indiferencia total."],
+                ans: 1,
+                fb: "Excelente deducción de emociones y actitudes implícitas."
+              }
+            ]
+          },
+          {
+            key: "cierre",
+            badge: "Fase 3 • Cierre (Poslectura)",
+            badgeClass: "bg-cierre",
+            tabClass: "pt-cierre",
+            name: "Misión La Guajira",
+            title: "Reto de Cierre: “Misión en La Guajira: el cactus y el corral”",
+            readingTitle: "Travesía por la cultura Wayuu (Cada acierto hace crecer el cactus y suma chivitos)",
+            reading: "En la ranchería, la abuela tejió una mochila con figuras de olas y caminos largos antes del viaje de su nieto hacia la ciudad, diciéndole: 'Llévala siempre para que nunca olvides de dónde vienes'.",
+            isCactus: true,
+            questions: [
+              {
+                q: "Parada 1: ¿Qué simboliza la mochila que le entregó la abuela?",
+                opts: ["Solo un objeto para guardar cuadernos.", "El vínculo familiar, la identidad y las raíces culturales Wayuu.", "Un castigo por irse de viaje."],
+                ans: 1,
+                fb: "¡Crece el cactus cardón y llega un chivito al corral! Excelente inferencia cultural."
+              },
+              {
+                q: "Parada 2: ¿Por qué la abuela tejió 'caminos largos' en la mochila?",
+                opts: ["Porque representan el recorrido de vida y el viaje que emprende su nieto.", "Porque se quedó sin hilo de otro color.", "Porque no sabía hacer otra figura."],
+                ans: 0,
+                fb: "¡Misión completada! El cactus floreció y el corral está lleno. Nivel Crítico desbloqueado."
+              }
+            ]
+          }
+        ]
+      },
+      3: {
+        unlockedPhase: 0,
+        currentPhase: 0,
+        answered: {},
+        phases: [
+          {
+            key: "concept",
+            badge: "Fase 0 • Conceptualización",
+            badgeClass: "bg-concept",
+            tabClass: "pt-concept",
+            name: "Mirada Crítica",
+            title: "Conceptualización: ¿Qué es el Nivel Crítico?",
+            readingTitle: "Cápsula conceptual (Google Classroom)",
+            reading: "La lectura crítica nos permite evaluar la intención comunicativa de un texto o anuncio, diferenciar hechos comprobables de opiniones o exageraciones y sustentar una postura propia con argumentos.",
+            questions: []
+          },
+          {
+            key: "inicio",
+            badge: "Fase 1 • Inicio (Prelectura)",
+            badgeClass: "bg-inicio",
+            tabClass: "pt-inicio",
+            name: "Muro Crítico",
+            title: "Reto de Inicio: “Observemos los anuncios”",
+            readingTitle: "Anuncio en redes: '¡Últimos 3 minutos!'",
+            reading: "Un aviso parpadeante dice: '¡COMPRA YA ESTOS TENIS MÁGICOS! Solo quedan 2 pares en todo el planeta. ¡Si no compras hoy, perderás tu única oportunidad!'.",
+            questions: [
+              {
+                q: "¿Qué técnica de persuasión utiliza este anuncio?",
+                opts: ["Información científica verificada.", "Urgencia y escasez artificial para presionar una compra sin pensar.", "Un consejo neutral de salud."],
+                ans: 1,
+                fb: "Exacto. Reconociste la presión por urgencia y escasez artificial."
+              }
+            ]
+          },
+          {
+            key: "desarrollo",
+            badge: "Fase 2 • Desarrollo (Lectura)",
+            badgeClass: "bg-desarrollo",
+            tabClass: "pt-desarrollo",
+            name: "Aventureros Críticos",
+            title: "Reto de Desarrollo: “Aventureros Críticos” (Neuro-Flash y Brain-Max)",
+            readingTitle: "Análisis publicitario: 'El milagro en una botella'",
+            reading: "El comercial de 'Brain-Max' muestra a un actor con bata blanca diciendo: '9 de cada 10 genios beben Brain-Max para memorizar libros enteros en 5 minutos'. No cita ningún estudio real.",
+            questions: [
+              {
+                q: "¿Qué recurso persuasivo engañoso emplea el comercial?",
+                opts: ["Falsa autoridad (actor con bata blanca) y promesas imposibles sin evidencia.", "Un reporte médico oficial.", "Una reseña literaria."],
+                ans: 0,
+                fb: "Excelente análisis crítico: identificaste la falsa autoridad."
+              }
+            ]
+          },
+          {
+            key: "cierre",
+            badge: "Fase 3 • Cierre (Poslectura)",
+            badgeClass: "bg-cierre",
+            tabClass: "pt-cierre",
+            name: "Tribunal Barrancas",
+            title: "Reto de Cierre: “Tribunal de Barrancas: Misión de Lectura Crítica”",
+            readingTitle: "Caso final del Tribunal",
+            reading: "Un influencer afirma en un video: 'Leer libros largos es una pérdida de tiempo, con ver resúmenes de 15 segundos ya sabes todo lo necesario para la vida'.",
+            questions: [
+              {
+                q: "Como juez crítico, ¿cuál es el argumento más sólido para refutar esa afirmación?",
+                opts: ["Porque los libros tienen muchas páginas.", "Porque los resúmenes breves omiten matices, vocabulario y contexto necesarios para inferir y argumentar con profundidad.", "Porque los videos no sirven para nada."],
+                ans: 1,
+                fb: "¡Módulo 3 superado! Has desbloqueado la Evaluación Final: La Escalera del Saber."
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+    /* ================= DATOS POST-TEST: LA ESCALERA DEL SABER ================= */
+    const postData = [
+      {
+        step: "Peldaño 1",
+        level: "literal",
+        levelTag: "Nivel Literal",
+        pill: "pill-lit",
+        readingTitle: "Texto 1: El Hombre Caimán (Tradición Oral)",
+        reading: "Según la leyenda del Caribe colombiano, Saúl Montenegro bebía una pócima preparada por un brujo para transformarse en caimán y observar desde el río Magdalena a las bañistas de Plato.",
+        q: "1. ¿Qué utilizaba Saúl Montenegro para transformarse en caimán?",
+        opts: ["Una pócima preparada por un brujo.", "Un sombrero mágico.", "Un canto nocturno."],
+        ans: 0,
+        fb: "Correcto. Dato explícito recuperado del texto."
+      },
+      {
+        step: "Peldaño 2",
+        level: "inferencial",
+        levelTag: "Nivel Inferencial",
+        pill: "pill-inf",
+        readingTitle: "Texto 2: La Madremonte",
+        reading: "Quienes talan los bosques sin medida o desvían los arroyos aseguran escuchar un bramido entre la niebla espesa; enseguida, los senderos desaparecen hasta que prometen respetar el monte.",
+        q: "2. ¿Qué propósito cumple la leyenda de La Madremonte en la comunidad?",
+        opts: ["Asustar a los niños sin motivo.", "Promover el respeto y la protección de los bosques y las fuentes de agua.", "Enseñar a construir caminos en la niebla."],
+        ans: 1,
+        fb: "Excelente inferencia sobre la función ecológica y cultural del relato."
+      },
+      {
+        step: "Peldaño 3",
+        level: "inferencial",
+        levelTag: "Nivel Inferencial",
+        pill: "pill-inf",
+        readingTitle: "Texto 3: El Origen del Arcoíris (Mito Wayuu)",
+        reading: "En la cosmovisión Wayuu, el arcoíris enlaza el cielo y la tierra tras la lluvia, recordando el equilibrio entre los seres humanos, los animales del desierto y la naturaleza que los sostiene.",
+        q: "3. ¿Qué relación con la naturaleza se deduce de este mito Wayuu?",
+        opts: ["Una relación de armonía e interdependencia entre la comunidad y el entorno.", "Que el desierto nunca necesita lluvia.", "Que el cielo y la tierra están peleados."],
+        ans: 0,
+        fb: "Muy bien. Deduciste el valor de armonía propio de la cosmovisión Wayuu."
+      },
+      {
+        step: "Peldaño 4",
+        level: "critico",
+        levelTag: "Nivel Crítico",
+        pill: "pill-cri",
+        readingTitle: "Texto 4: La Llorona",
+        reading: "Muchas leyendas tradicionales como La Llorona se transmiten de generación en generación alrededor de las reuniones familiares, adaptándose a cada región del país.",
+        q: "4. ¿Por qué es valioso conservar y leer estas leyendas en la escuela?",
+        opts: ["Porque son cortas y fáciles de copiar.", "Porque preservan la memoria oral, fortalecen la identidad cultural y permiten analizar valores comunitarios.", "Porque reemplazan todas las demás asignaturas."],
+        ans: 1,
+        fb: "Excelente valoración crítica sustentada."
+      },
+      {
+        step: "Peldaño 5",
+        level: "critico",
+        levelTag: "Nivel Crítico",
+        pill: "pill-cri",
+        readingTitle: "Texto 5: Póster de Evento Cultural (Texto Discontinuo)",
+        reading: "PÓSTER: 'Festival de Lectura y Tradición Oral en Barrancas — Entrada libre. Sábado 8:00 a.m. en la Plaza Principal. Trae tu libro favorito para intercambiar y participa en el taller de mitos Wayuu'.",
+        q: "5. ¿Cuál es la intención principal de este póster y a quién beneficia?",
+        opts: ["Vender boletas costosas solo a turistas.", "Convocar gratuitamente a la comunidad para fomentar la lectura, el intercambio de libros y la cultura local.", "Prohibir la entrada de estudiantes a la plaza."],
+        ans: 1,
+        fb: "¡Llegaste a la cima de La Escalera del Saber!"
+      }
+    ];
+
+    const postState = { answered: {}, score: { literal: 0, inferencial: 0, critico: 0 } };
+
+    /* ================= NAVEGACIÓN DE NIVELES ================= */
+    function updateNavLocks() {
+      for (let i = 0; i <= 4; i++) {
+        const btn = document.getElementById('nav-' + i);
+        const st = document.getElementById('st-' + i);
+        const isOpen = exploreMode || i <= unlockedLevel;
+        btn.classList.toggle('locked', !isOpen);
+        if (i < unlockedLevel) st.textContent = "✅ Completado";
+        else if (i === unlockedLevel) st.textContent = "🟢 Disponible";
+        else st.textContent = exploreMode ? "🔓 Libre" : "🔒 Bloqueado";
+      }
     }
 
-    function checkMini(btnEl, isCorrect, msgId, text) {
-      const group = btnEl.parentElement.querySelectorAll('.q-btn');
-      group.forEach(b => { b.classList.remove('ok', 'err'); });
-      btnEl.classList.add(isCorrect ? 'ok' : 'err');
-      const msg = document.getElementById(msgId);
-      msg.style.display = 'block';
-      msg.style.color = isCorrect ? '#15803d' : '#b91c1c';
-      msg.textContent = (isCorrect ? '✅ ' : '❌ ') + text;
+    function goLevel(lvl) {
+      if (!exploreMode && lvl > unlockedLevel) return;
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + lvl).classList.add('active');
+      document.getElementById('nav-' + lvl).classList.add('active');
+      if (lvl >= 1 && lvl <= 3) renderModule(lvl);
+      if (lvl === 4) renderPost();
     }
+
+    function toggleExploreMode() {
+      exploreMode = !exploreMode;
+      document.getElementById('unlockBtn').textContent = exploreMode ? "🔒 Volver a Modo Progresivo" : "🔓 Modo Exploración";
+      updateNavLocks();
+      [1, 2, 3].forEach(m => renderModule(m));
+    }
+
+    /* ================= RENDER DIAGNÓSTICO ================= */
+    function renderDiag() {
+      const wrap = document.getElementById('diag-container');
+      wrap.innerHTML = '';
+      diagData.forEach((item, idx) => {
+        const box = document.createElement('div');
+        box.className = 'q-item';
+        box.innerHTML = `
+          <span class="q-lvl-pill ${item.pill}">${item.levelTag}</span>
+          <div class="reading-card">
+            <div class="r-title">${item.readingTitle}</div>
+            <p>${item.reading}</p>
+          </div>
+          <div class="q-title">${item.q}</div>
+          <div class="opts" id="d-opts-${idx}"></div>
+          <div class="fb" id="d-fb-${idx}"></div>
+        `;
+        wrap.appendChild(box);
+        const optsEl = box.querySelector('#d-opts-' + idx);
+        item.opts.forEach((txt, oIdx) => {
+          const b = document.createElement('button');
+          b.className = 'opt-btn';
+          b.textContent = `${String.fromCharCode(65 + oIdx)}. ${txt}`;
+          b.onclick = () => answerDiag(idx, oIdx);
+          optsEl.appendChild(b);
+        });
+      });
+    }
+
+    function answerDiag(qIdx, oIdx) {
+      if (diagState.answered[qIdx] !== undefined) return;
+      diagState.answered[qIdx] = oIdx;
+      const item = diagData[qIdx];
+      const btns = document.querySelectorAll(`#d-opts-${qIdx} .opt-btn`);
+      btns.forEach(b => b.disabled = true);
+      const fb = document.getElementById(`d-fb-${qIdx}`);
+      if (oIdx === item.ans) {
+        btns[oIdx].classList.add('correct');
+        diagState.score[item.level]++;
+        fb.className = 'fb show ok';
+        fb.textContent = '✅ ' + item.fb;
+      } else {
+        btns[oIdx].classList.add('wrong');
+        btns[item.ans].classList.add('correct');
+        fb.className = 'fb show err';
+        fb.textContent = `❌ Opción correcta: ${String.fromCharCode(65 + item.ans)}. ${item.fb}`;
+      }
+      if (Object.keys(diagState.answered).length === diagData.length) {
+        showDiagReport();
+      }
+    }
+
+    function showDiagReport() {
+      unlockedLevel = Math.max(unlockedLevel, 1);
+      updateNavLocks();
+      const total = diagState.score.literal + diagState.score.inferencial + diagState.score.critico;
+      const pct = Math.round((total / diagData.length) * 100);
+      const rep = document.getElementById('diag-report');
+      rep.style.display = 'block';
+      rep.innerHTML = `
+        <div class="report-box">
+          <h3 style="color:var(--diag-main);">📋 Resultados de tu Diagnóstico</h3>
+          <div class="metrics-grid">
+            <div class="m-card"><div class="val" style="color:var(--diag-main);">${total}/${diagData.length} (${pct}%)</div><div class="lbl">Puntaje Diagnóstico</div></div>
+            <div class="m-card"><div class="val" style="color:var(--lit-main);">${diagState.score.literal}/2</div><div class="lbl">Nivel Literal</div></div>
+            <div class="m-card"><div class="val" style="color:var(--inf-main);">${diagState.score.inferencial}/2</div><div class="lbl">Nivel Inferencial</div></div>
+            <div class="m-card"><div class="val" style="color:var(--cri-main);">${diagState.score.critico}/2</div><div class="lbl">Nivel Crítico</div></div>
+          </div>
+          <button class="btn-action btn-next-lvl" onclick="goLevel(1)">📘 Avanzar al Módulo 1: Nivel Literal ➔</button>
+        </div>
+      `;
+    }
+
+    /* ================= RENDER MÓDULOS (CON FASES DIFERENCIADAS) ================= */
+    function renderModule(modId) {
+      const mod = modulesData[modId];
+      const stepper = document.getElementById('stepper-' + modId);
+      stepper.innerHTML = '';
+
+      mod.phases.forEach((ph, pIdx) => {
+        const isOpen = exploreMode || pIdx <= mod.unlockedPhase;
+        const btn = document.createElement('button');
+        btn.className = `phase-tab ${ph.tabClass} ${pIdx === mod.currentPhase ? 'active' : ''} ${!isOpen ? 'locked' : ''}`;
+        btn.innerHTML = `<span class="pt-lbl">${ph.badge}</span><span class="pt-name">${!isOpen ? '🔒 ' : ''}${ph.name}</span>`;
+        btn.onclick = () => {
+          if (!isOpen) return;
+          mod.currentPhase = pIdx;
+          renderModule(modId);
+        };
+        stepper.appendChild(btn);
+      });
+
+      const ph = mod.phases[mod.currentPhase];
+      const stage = document.getElementById('stage-' + modId);
+      stage.innerHTML = `
+        <span class="phase-badge ${ph.badgeClass}">${ph.badge}</span>
+        <h3 style="margin-bottom:10px; font-size:1.05rem;">${ph.title}</h3>
+        ${ph.isCactus ? `<div class="gamif-strip"><span>🌵 Progreso del Cardón: ${'🌵'.repeat(mod.cactusScore + 1)}</span><span>🐐 Chivitos en el corral: ${mod.cactusScore}/2</span></div>` : ''}
+        <div class="reading-card">
+          <div class="r-title">${ph.readingTitle}</div>
+          <p>${ph.reading}</p>
+        </div>
+        <div id="m-qs-${modId}"></div>
+        <div id="m-next-${modId}"></div>
+      `;
+
+      const qsWrap = document.getElementById('m-qs-' + modId);
+      if (ph.questions.length === 0) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn-action';
+        nextBtn.textContent = '✅ Comprendido, avanzar a Fase 1 (Inicio) ➔';
+        nextBtn.onclick = () => {
+          mod.unlockedPhase = Math.max(mod.unlockedPhase, 1);
+          mod.currentPhase = 1;
+          renderModule(modId);
+        };
+        document.getElementById('m-next-' + modId).appendChild(nextBtn);
+      } else {
+        ph.questions.forEach((qObj, qIdx) => {
+          const qKey = `${mod.currentPhase}-${qIdx}`;
+          const prevAns = mod.answered[qKey];
+          const qDiv = document.createElement('div');
+          qDiv.className = 'q-item';
+          qDiv.innerHTML = `<div class="q-title">${qObj.q}</div><div class="opts" id="m-opts-${modId}-${qIdx}"></div><div class="fb" id="m-fb-${modId}-${qIdx}"></div>`;
+          qsWrap.appendChild(qDiv);
+
+          const optsEl = qDiv.querySelector(`#m-opts-${modId}-${qIdx}`);
+          qObj.opts.forEach((txt, oIdx) => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.textContent = `${String.fromCharCode(65 + oIdx)}. ${txt}`;
+            if (prevAns !== undefined) {
+              b.disabled = true;
+              if (oIdx === qObj.ans) b.classList.add('correct');
+              else if (oIdx === prevAns) b.classList.add('wrong');
+            }
+            b.onclick = () => answerMod(modId, mod.currentPhase, qIdx, oIdx);
+            optsEl.appendChild(b);
+          });
+
+          if (prevAns !== undefined) {
+            const fb = qDiv.querySelector(`#m-fb-${modId}-${qIdx}`);
+            if (prevAns === qObj.ans) {
+              fb.className = 'fb show ok';
+              fb.textContent = '✅ ' + qObj.fb;
+            } else {
+              fb.className = 'fb show err';
+              fb.textContent = `❌ Opción correcta: ${String.fromCharCode(65 + qObj.ans)}. ${qObj.fb}`;
+            }
+          }
+        });
+        checkModulePhaseDone(modId);
+      }
+    }
+
+    function answerMod(modId, pIdx, qIdx, oIdx) {
+      const mod = modulesData[modId];
+      const qKey = `${pIdx}-${qIdx}`;
+      if (mod.answered[qKey] !== undefined) return;
+      mod.answered[qKey] = oIdx;
+      const qObj = mod.phases[pIdx].questions[qIdx];
+      if (mod.phases[pIdx].isCactus && oIdx === qObj.ans) {
+        mod.cactusScore++;
+      }
+      renderModule(modId);
+    }
+
+    function checkModulePhaseDone(modId) {
+      const mod = modulesData[modId];
+      const pIdx = mod.currentPhase;
+      const ph = mod.phases[pIdx];
+      const allAnswered = ph.questions.every((_, i) => mod.answered[`${pIdx}-${i}`] !== undefined);
+      if (!allAnswered) return;
+
+      const nextWrap = document.getElementById('m-next-' + modId);
+      nextWrap.innerHTML = '';
+      if (pIdx < mod.phases.length - 1) {
+        mod.unlockedPhase = Math.max(mod.unlockedPhase, pIdx + 1);
+        const btn = document.createElement('button');
+        btn.className = 'btn-action';
+        btn.textContent = `Avanzar a ${mod.phases[pIdx + 1].badge} ➔`;
+        btn.onclick = () => {
+          mod.currentPhase = pIdx + 1;
+          renderModule(modId);
+        };
+        nextWrap.appendChild(btn);
+      } else {
+        unlockedLevel = Math.max(unlockedLevel, modId + 1);
+        updateNavLocks();
+        const nextNames = { 1: "🔍 Módulo 2: Nivel Inferencial", 2: "⚖️ Módulo 3: Nivel Crítico", 3: "🏆 Post-test: La Escalera del Saber" };
+        const btn = document.createElement('button');
+        btn.className = 'btn-action btn-next-lvl';
+        btn.textContent = `🎉 Nivel superado — Ir a ${nextNames[modId]} ➔`;
+        btn.onclick = () => goLevel(modId + 1);
+        nextWrap.appendChild(btn);
+      }
+    }
+
+    /* ================= RENDER POST-TEST ================= */
+    function renderPost() {
+      const ladder = document.getElementById('ladder-steps');
+      ladder.innerHTML = '';
+      postData.forEach((it, i) => {
+        const done = postState.answered[i] !== undefined;
+        const cell = document.createElement('div');
+        cell.className = `step-cell ${done ? 'done' : ''}`;
+        cell.textContent = `${done ? '🏆 ' : ''}${it.step}`;
+        ladder.appendChild(cell);
+      });
+
+      const wrap = document.getElementById('post-container');
+      wrap.innerHTML = '';
+      postData.forEach((item, idx) => {
+        const prev = postState.answered[idx];
+        const box = document.createElement('div');
+        box.className = 'q-item';
+        box.innerHTML = `
+          <span class="q-lvl-pill ${item.pill}">${item.step} • ${item.levelTag}</span>
+          <div class="reading-card">
+            <div class="r-title">${item.readingTitle}</div>
+            <p>${item.reading}</p>
+          </div>
+          <div class="q-title">${item.q}</div>
+          <div class="opts" id="p-opts-${idx}"></div>
+          <div class="fb" id="p-fb-${idx}"></div>
+        `;
+        wrap.appendChild(box);
+        const optsEl = box.querySelector('#p-opts-' + idx);
+        item.opts.forEach((txt, oIdx) => {
+          const b = document.createElement('button');
+          b.className = 'opt-btn';
+          b.textContent = `${String.fromCharCode(65 + oIdx)}. ${txt}`;
+          if (prev !== undefined) {
+            b.disabled = true;
+            if (oIdx === item.ans) b.classList.add('correct');
+            else if (oIdx === prev) b.classList.add('wrong');
+          }
+          b.onclick = () => answerPost(idx, oIdx);
+          optsEl.appendChild(b);
+        });
+        if (prev !== undefined) {
+          const fb = box.querySelector('#p-fb-' + idx);
+          if (prev === item.ans) {
+            fb.className = 'fb show ok';
+            fb.textContent = '✅ ' + item.fb;
+          } else {
+            fb.className = 'fb show err';
+            fb.textContent = `❌ Opción correcta: ${String.fromCharCode(65 + item.ans)}. ${item.fb}`;
+          }
+        }
+      });
+
+      if (Object.keys(postState.answered).length === postData.length) {
+        showPostReport();
+      }
+    }
+
+    function answerPost(qIdx, oIdx) {
+      if (postState.answered[qIdx] !== undefined) return;
+      postState.answered[qIdx] = oIdx;
+      if (oIdx === postData[qIdx].ans) {
+        postState.score[postData[qIdx].level]++;
+      }
+      renderPost();
+    }
+
+    function showPostReport() {
+      const diagTot = diagState.score.literal + diagState.score.inferencial + diagState.score.critico;
+      const diagPct = Math.round((diagTot / diagData.length) * 100);
+      const postTot = postState.score.literal + postState.score.inferencial + postState.score.critico;
+      const postPct = Math.round((postTot / postData.length) * 100);
+      const siee = (postPct / 20).toFixed(1);
+      let cat = "Bajo";
+      if (siee >= 4.6) cat = "Superior";
+      else if (siee >= 4.0) cat = "Alto";
+      else if (siee >= 3.0) cat = "Básico";
+
+      const rep = document.getElementById('post-report');
+      rep.style.display = 'block';
+      rep.innerHTML = `
+        <div class="report-box" style="background:#fffbeb; border-color:var(--post-main);">
+          <h3 style="color:var(--post-main);">🏆 ¡Misión Cumplida! Reporte Final de La Escalera del Saber</h3>
+          <div class="metrics-grid">
+            <div class="m-card"><div class="val" style="color:var(--diag-main);">${diagPct}%</div><div class="lbl">Diagnóstico Inicial</div></div>
+            <div class="m-card"><div class="val" style="color:var(--post-main);">${postPct}% (${postTot}/${postData.length})</div><div class="lbl">Resultado Post-test</div></div>
+            <div class="m-card"><div class="val" style="color:var(--ok);">${siee} — ${cat}</div><div class="lbl">Valoración SIEE</div></div>
+          </div>
+          <a class="btn-top" style="display:inline-block; margin-top:8px;" href="https://classroom.google.com/c/Nzk4MjIyNzYyMDc4?hl=es&cjc=umxduefs" target="_blank" rel="noopener noreferrer">
+            🎓 Volver al Curso en Google Classroom
+          </a>
+        </div>
+      `;
+    }
+
+    /* ================= INICIALIZACIÓN ================= */
+    renderDiag();
+    updateNavLocks();
   </script>
 </body>
 </html>
